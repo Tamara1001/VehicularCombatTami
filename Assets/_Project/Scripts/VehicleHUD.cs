@@ -1,69 +1,75 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro; // Requerido para manejar los textos profesionales
 
-/// <summary>
-/// Conecta los componentes de Vida y Nitro del vehículo con las barras visuales en la UI.
-/// Purely reactive — subscribes to events and routes normalized values to bars.
-/// </summary>
 public class VehicleHUD : MonoBehaviour
 {
     [Header("Data Sources")]
-    [Tooltip("El componente HealthComponent en el vehículo.")]
     [SerializeField] private HealthComponent vehicleHealth;
-
-    [Tooltip("El componente VehicleResourceComponent en el vehículo.")]
     [SerializeField] private VehicleResourceComponent vehicleResources;
+    [SerializeField] private VehicleWeapon vehicleWeapon; // La nueva fuente de datos
 
-    [Header("Bar Fill Images (Image Type = Filled)")]
-    [Tooltip("Imagen de la barra de Vida (Image Type: Filled).")]
+    [Header("Bar Fill Images")]
     [SerializeField] private Image healthBarFill;
-
-    [Tooltip("Imagen de la barra de Nitro/Boost (Image Type: Filled).")]
     [SerializeField] private Image boostBarFill;
+
+    [Header("Text Elements")]
+    [Tooltip("El texto en la UI que mostrará las balas (TextMeshPro).")]
+    [SerializeField] private TextMeshProUGUI ammoText;
 
     private void OnEnable()
     {
-        // Suscribir eventos de salud
         if (vehicleHealth != null)
         {
             vehicleHealth.OnHealthChanged += UpdateHealthBar;
-            UpdateHealthBar(vehicleHealth.GetNormalizedHealth()); // Sincronización inicial
-        }
-        else
-        {
-            Debug.LogWarning("[VehicleHUD] vehicleHealth no está asignado.", this);
+            UpdateHealthBar(vehicleHealth.GetNormalizedHealth());
         }
 
-        // Suscribir eventos de recursos (Nitro)
         if (vehicleResources != null)
         {
             vehicleResources.OnBoostChanged += UpdateBoostBar;
-            UpdateBoostBar(vehicleResources.GetNormalizedBoost()); // Sincronización inicial
+            UpdateBoostBar(vehicleResources.GetNormalizedBoost());
         }
-        else
+
+        if (vehicleWeapon != null)
         {
-            Debug.LogWarning("[VehicleHUD] vehicleResources no está asignado.", this);
+            // Nos suscribimos al nuevo evento de munición
+            vehicleWeapon.OnAmmoChanged += UpdateAmmoText;
         }
     }
 
     private void OnDisable()
     {
-        if (vehicleHealth != null)
-            vehicleHealth.OnHealthChanged -= UpdateHealthBar;
-
-        if (vehicleResources != null)
-            vehicleResources.OnBoostChanged -= UpdateBoostBar;
+        if (vehicleHealth != null) vehicleHealth.OnHealthChanged -= UpdateHealthBar;
+        if (vehicleResources != null) vehicleResources.OnBoostChanged -= UpdateBoostBar;
+        if (vehicleWeapon != null) vehicleWeapon.OnAmmoChanged -= UpdateAmmoText;
     }
 
     private void UpdateHealthBar(float normalized)
     {
-        if (healthBarFill != null)
-            healthBarFill.fillAmount = normalized;
+        if (healthBarFill != null) healthBarFill.fillAmount = normalized;
     }
 
     private void UpdateBoostBar(float normalized)
     {
-        if (boostBarFill != null)
-            boostBarFill.fillAmount = normalized;
+        if (boostBarFill != null) boostBarFill.fillAmount = normalized;
+    }
+
+    private void UpdateAmmoText(int current, int max)
+    {
+        if (ammoText == null) return;
+
+        // El script del arma envía un -1 cuando está ejecutando la corrutina de recarga
+        if (current < 0)
+        {
+            ammoText.text = "RECARGANDO...";
+            ammoText.color = Color.yellow;
+        }
+        else
+        {
+            ammoText.text = $"{current} / {max}";
+            // Cambiar a color rojo si quedan 5 balas o menos, sino blanco
+            ammoText.color = current <= 5 ? Color.red : Color.white;
+        }
     }
 }

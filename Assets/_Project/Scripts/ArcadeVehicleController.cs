@@ -1,43 +1,33 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-/// <summary>
-/// Controls an arcade-style combat vehicle using Rigidbody movement.
-/// Modificado para incluir mecánicas de gravedad lunar y salto.
-/// </summary>
-[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(Rigidbody), typeof(VehicleResourceComponent))]
 public sealed class ArcadeVehicleController : MonoBehaviour
 {
     [Header("Movement")]
-    [SerializeField]
-    [Tooltip("Forward acceleration applied while pressing vertical input.")]
-    private float acceleration = 35f;
-
-    [SerializeField]
-    [Tooltip("Maximum forward speed.")]
-    private float maximumForwardSpeed = 18f;
-
-    [SerializeField]
-    [Tooltip("Maximum reverse speed.")]
-    private float maximumReverseSpeed = 8f;
-
-    [SerializeField]
-    [Tooltip("Vehicle turn speed.")]
-    private float turnSpeed = 120f;
-
-    [SerializeField]
-    [Tooltip("How strongly sideways velocity is reduced.")]
-    private float lateralFriction = 8f;
+    [SerializeField] private float acceleration = 35f;
+    [SerializeField] private float maximumForwardSpeed = 18f;
+    [SerializeField] private float maximumReverseSpeed = 8f;
+    [SerializeField] private float turnSpeed = 120f;
+    [SerializeField] private float lateralFriction = 8f;
 
     [Header("Brake")]
+    [SerializeField] private float brakeForce = 18f;
+
+    [Header("Nitro (Boost)")]
+    [SerializeField] private float nitroSpeedMultiplier = 1.6f;
+    [SerializeField] private float nitroAccelMultiplier = 2f;
     [SerializeField]
-    [Tooltip("Brake force applied while pressing the brake input.")]
-    private float brakeForce = 18f;
+    [Tooltip("Costo de energía por segundo al usar Nitro.")]
+    private float nitroCostPerSecond = 35f;
 
     [Header("Lunar Mechanics")]
     [SerializeField] private float jumpForce = 15f;
     [SerializeField] private float lunarGravity = -1.62f;
     [SerializeField] private float earthGravity = -9.81f;
+    [SerializeField]
+    [Tooltip("Costo de energía por segundo al usar Gravedad Terrestre.")]
+    private float earthGravityCostPerSecond = 10f;
 
     [Header("Ground Check")]
     [SerializeField] private Transform groundCheck;
@@ -45,8 +35,10 @@ public sealed class ArcadeVehicleController : MonoBehaviour
     [SerializeField] private LayerMask groundLayer;
 
     private Rigidbody _rigidbody;
+    private VehicleResourceComponent _resourceComponent;
     private Vector2 _movementInput;
     private bool _isBraking;
+    private bool _isNitroPressed;
 
     private bool _isLunarGravity = true;
     private float _currentGravity;
@@ -54,32 +46,28 @@ public sealed class ArcadeVehicleController : MonoBehaviour
     private void Awake()
     {
         _rigidbody = GetComponent<Rigidbody>();
+        _resourceComponent = GetComponent<VehicleResourceComponent>();
         _rigidbody.useGravity = false;
         _currentGravity = lunarGravity;
     }
 
     private void FixedUpdate()
     {
+        ManageGravityState();
+        bool isActuallyBoosting = ManageNitroState();
+
         ApplyCustomGravity();
-        ApplyAcceleration();
+        ApplyAcceleration(isActuallyBoosting);
         ApplyTurning();
         ApplyLateralFriction();
 
-        if (_isBraking)
-        {
-            ApplyBrake();
-        }
+        if (_isBraking) ApplyBrake();
     }
 
-    public void RespondToMoveInput(InputAction.CallbackContext context)
-    {
-        _movementInput = context.ReadValue<Vector2>();
-    }
-
-    public void RespondToBrakeInput(InputAction.CallbackContext context)
-    {
-        _isBraking = context.ReadValueAsButton();
-    }
+    // --- INPUTS ---
+    public void RespondToMoveInput(InputAction.CallbackContext context) => _movementInput = context.ReadValue<Vector2>();
+    public void RespondToBrakeInput(InputAction.CallbackContext context) => _isBraking = context.ReadValueAsButton();
+    public void RespondToBoostInput(InputAction.CallbackContext context) => _isNitroPressed = context.ReadValueAsButton(); // NUEVO INPUT
 
     public void RespondToJumpInput(InputAction.CallbackContext context)
     {
@@ -95,19 +83,49 @@ public sealed class ArcadeVehicleController : MonoBehaviour
         {
             _isLunarGravity = !_isLunarGravity;
             _currentGravity = _isLunarGravity ? lunarGravity : earthGravity;
-            Debug.Log("Gravedad actual: " + (_isLunarGravity ? "Lunar" : "Terrestre"));
         }
     }
 
-    private void ApplyAcceleration()
+    // --- LÓGICA DE ENERGÍA ---
+    private void ManageGravityState()
     {
+        // Si estamos en gravedad terrestre, drenar energía constantemente
+        if (!_isLunarGravity)
+        {
+            if (!_resourceComponent.TryConsumeContinuous(earthGravityCostPerSecond))
+            {
+                // Si nos quedamos sin energía, forzar gravedad lunar
+                _isLunarGravity = true;
+                _currentGravity = lunarGravity;
+                Debug.Log("Gravedad forzada a Lunar: ¡Falta de energía!");
+            }
+        }
+    }
+
+    private bool ManageNitroState()
+    {
+        // Solo podemos usar nitro si apretamos el botón Y estamos acelerando hacia adelante
+        if (_isNitroPressed && _movementInput.y > 0)
+        {
+            return _resourceComponent.TryConsumeContinuous(nitroCostPerSecond);
+        }
+        return false;
+    }
+
+    // --- FÍSICAS MODIFICADAS ---
+    private void ApplyAcceleration(bool isBoosting)
+    {
+        // Multiplicar valores si el nitro está activo
+        float currentAccel = isBoosting ? acceleration * nitroAccelMultiplier : acceleration;
+        float currentMaxSpeed = isBoosting ? maximumForwardSpeed * nitroSpeedMultiplier : maximumForwardSpeed;
+
         float forwardSpeed = Vector3.Dot(_rigidbody.linearVelocity, transform.forward);
         float verticalInput = _movementInput.y;
 
-        if (verticalInput > 0f && forwardSpeed >= maximumForwardSpeed) return;
+        if (verticalInput > 0f && forwardSpeed >= currentMaxSpeed) return;
         if (verticalInput < 0f && forwardSpeed <= -maximumReverseSpeed) return;
 
-        Vector3 force = transform.forward * verticalInput * acceleration;
+        Vector3 force = transform.forward * verticalInput * currentAccel;
         _rigidbody.AddForce(force, ForceMode.Acceleration);
     }
 

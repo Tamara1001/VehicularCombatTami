@@ -1,11 +1,9 @@
+using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Pool;
-using UnityEngine.InputSystem; // Añadido para el Input
+using UnityEngine.InputSystem;
 
-/// <summary>
-/// Adaptación del sistema Object Pool para el vehículo lunar.
-/// Gestiona la recarga y la instancia de proyectiles hacia adelante.
-/// </summary>
 public sealed class VehicleWeapon : MonoBehaviour
 {
     [Header("Firing")]
@@ -13,16 +11,36 @@ public sealed class VehicleWeapon : MonoBehaviour
     [SerializeField] private Projectile projectilePrefab;
     [SerializeField] private float fireRate = 0.25f;
 
+    [Header("Ammo & Reloading")]
+    [SerializeField] private int maxAmmo = 20;
+    [SerializeField] private float reloadTime = 1.5f;
+
     [Header("Object Pool Settings")]
-    [SerializeField] private int poolDefaultCapacity = 10;
-    [SerializeField] private int poolMaxSize = 30;
+    [SerializeField] private int poolDefaultCapacity = 20;
+    [SerializeField] private int poolMaxSize = 40;
 
     private IObjectPool<Projectile> _projectilePool;
     private float _lastFireTime = float.NegativeInfinity;
 
+    private int _currentAmmo;
+    private bool _isReloading;
+
+    /// <summary>
+    /// Evento para actualizar el texto del HUD. 
+    /// Pasa la munición actual y la máxima. Si envía -1, significa que está recargando.
+    /// </summary>
+    public event Action<int, int> OnAmmoChanged;
+
     private void Awake()
     {
         CreatePool();
+        _currentAmmo = maxAmmo;
+    }
+
+    private void Start()
+    {
+        // Disparamos el evento al iniciar para que el HUD muestre "20 / 20"
+        OnAmmoChanged?.Invoke(_currentAmmo, maxAmmo);
     }
 
     private void OnDestroy()
@@ -30,26 +48,74 @@ public sealed class VehicleWeapon : MonoBehaviour
         _projectilePool?.Clear();
     }
 
-    // --- NUEVO MÉTODO PARA EL INPUT SYSTEM ---
-    /// <summary>
-    /// Conectá este método en el PlayerInput (Events -> Vehicle -> Fire)
-    /// </summary>
+    // --- INPUTS ---
     public void RespondToFireInput(InputAction.CallbackContext context)
     {
-        // Solo disparar cuando se presiona el botón, o mantener disparando si es un arma automática.
-        // Para que se sienta bien en un shooter, podés cambiar esto si querés mantener apretado.
+        // context.performed detecta el clic. 
         if (context.performed)
         {
             TryFire();
         }
     }
 
+    public void RespondToReloadInput(InputAction.CallbackContext context)
+    {
+        // Recarga manual (por ejemplo, con la tecla R)
+        if (context.performed && !_isReloading && _currentAmmo < maxAmmo)
+        {
+            StartCoroutine(ReloadRoutine());
+        }
+    }
+
+    /// <summary>
+    /// AI-facing fire entry point. Equivalent to pulling the trigger
+    /// without requiring an InputAction.CallbackContext wrapper.
+    /// Called by AI controllers (e.g. EnemyShooter) on their own
+    /// fire-rate timers. Internally delegates to the same TryFire()
+    /// logic used by player input, keeping a single code path.
+    /// </summary>
+    public void TryFireAI() => TryFire();
+
+    // --- LÓGICA DE DISPARO ---
     private void TryFire()
     {
+        if (_isReloading) return;
         if (Time.time < _lastFireTime + fireRate) return;
 
+        if (_currentAmmo <= 0)
+        {
+            // Auto-recarga si se quedó sin balas e intenta disparar
+            StartCoroutine(ReloadRoutine());
+            return;
+        }
+
         _lastFireTime = Time.time;
+        _currentAmmo--;
+
+        OnAmmoChanged?.Invoke(_currentAmmo, maxAmmo);
         FireProjectile();
+
+        // Opcional: Auto-recarga inmediata si la bala que acaba de salir era la última
+        if (_currentAmmo <= 0)
+        {
+            StartCoroutine(ReloadRoutine());
+        }
+    }
+
+    private IEnumerator ReloadRoutine()
+    {
+        _isReloading = true;
+
+        // Enviamos -1 para indicarle a la UI que muestre "Recargando..."
+        OnAmmoChanged?.Invoke(-1, maxAmmo);
+
+        yield return new WaitForSeconds(reloadTime);
+
+        _currentAmmo = maxAmmo;
+        _isReloading = false;
+
+        // Actualizamos la UI con el cargador lleno
+        OnAmmoChanged?.Invoke(_currentAmmo, maxAmmo);
     }
 
     private void FireProjectile()
@@ -57,7 +123,7 @@ public sealed class VehicleWeapon : MonoBehaviour
         _projectilePool.Get();
     }
 
-    // --- MÉTODOS DEL POOL ORIGINIAL ---
+    // --- MÉTODOS DEL POOL ---
     private void CreatePool()
     {
         _projectilePool = new ObjectPool<Projectile>(

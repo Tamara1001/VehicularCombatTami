@@ -2,26 +2,23 @@ using System;
 using UnityEngine;
 
 /// <summary>
-/// Gestiona el recurso secundario del vehículo: el Nitro (Boost).
-/// El nitro se recarga automáticamente con el tiempo y puede ser consumido para acelerar.
+/// Gestiona el recurso secundario del vehículo: el Nitro (Boost) y Gravedad Terrestre.
 /// </summary>
 public sealed class VehicleResourceComponent : MonoBehaviour
 {
     [Header("Boost Settings")]
-    [Tooltip("Cantidad máxima de energía para el nitro.")]
-    [Min(1)]
-    [SerializeField] private int _maxBoost = 100;
+    [Tooltip("Cantidad máxima de energía.")]
+    [Min(1)][SerializeField] private int _maxBoost = 100;
 
-    [Tooltip("Puntos de nitro que se regeneran por segundo.")]
-    [Min(0f)]
-    [SerializeField] private float _boostRegenPerSecond = 10f;
+    [Tooltip("Puntos de energía que se regeneran por segundo.")]
+    [Min(0f)][SerializeField] private float _boostRegenPerSecond = 10f;
+
+    [Tooltip("Tiempo a esperar antes de regenerar tras gastar energía.")]
+    [Min(0f)][SerializeField] private float _regenDelay = 0.5f;
 
     private float _currentBoost;
+    private float _timeSinceLastConsumption;
 
-    /// <summary>
-    /// Evento que se dispara cada vez que el valor del nitro cambia.
-    /// Pasa un float normalizado [0, 1] ideal para las barras de la UI.
-    /// </summary>
     public event Action<float> OnBoostChanged;
 
     public int CurrentBoost => (int)_currentBoost;
@@ -29,7 +26,7 @@ public sealed class VehicleResourceComponent : MonoBehaviour
 
     private void Awake()
     {
-        _currentBoost = _maxBoost; // Empezamos con el tanque lleno
+        _currentBoost = _maxBoost;
     }
 
     private void Start()
@@ -39,19 +36,26 @@ public sealed class VehicleResourceComponent : MonoBehaviour
 
     private void Update()
     {
-        RegenerateBoost();
+        _timeSinceLastConsumption += Time.deltaTime;
+
+        // Solo regenera si pasó el tiempo de delay
+        if (_timeSinceLastConsumption >= _regenDelay)
+        {
+            RegenerateBoost();
+        }
     }
 
     /// <summary>
-    /// Intenta consumir la cantidad especificada de nitro.
-    /// Retorna true si fue exitoso (y resta el valor), false si no alcanza la energía.
+    /// Intenta consumir energía de forma continua (ideal para Update/FixedUpdate).
     /// </summary>
-    public bool TryConsumeBoost(int amount)
+    public bool TryConsumeContinuous(float costPerSecond)
     {
-        if (amount <= 0) return false;
-        if (_currentBoost < amount) return false;
+        float costThisFrame = costPerSecond * Time.deltaTime;
 
-        _currentBoost -= amount;
+        if (_currentBoost < costThisFrame) return false; // No hay suficiente energía
+
+        _currentBoost -= costThisFrame;
+        _timeSinceLastConsumption = 0f; // Reiniciamos el temporizador de regeneración
         OnBoostChanged?.Invoke(GetNormalizedBoost());
         return true;
     }
