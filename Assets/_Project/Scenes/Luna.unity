@@ -4931,15 +4931,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7221148531037032002, guid: 9e08fc1589434af4cbdaead5f6a2df19, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -101.2464
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7221148531037032002, guid: 9e08fc1589434af4cbdaead5f6a2df19, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7221148531037032002, guid: 9e08fc1589434af4cbdaead5f6a2df19, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 28.58736
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7221148531037032002, guid: 9e08fc1589434af4cbdaead5f6a2df19, type: 3}
       propertyPath: m_LocalRotation.w
