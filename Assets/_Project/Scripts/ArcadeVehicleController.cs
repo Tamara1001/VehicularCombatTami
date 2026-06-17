@@ -29,6 +29,10 @@ public sealed class ArcadeVehicleController : MonoBehaviour
     [Tooltip("Costo de energía por segundo al usar Gravedad Terrestre.")]
     private float earthGravityCostPerSecond = 10f;
 
+    [Header("Stabilization")]
+    [Tooltip("Qué tan rápido se endereza el auto en el aire o se adapta a las rampas.")]
+    [SerializeField] private float stabilizationSpeed = 5f;
+
     [Header("Ground Check")]
     [SerializeField] private Transform groundCheck;
     [SerializeField] private float groundRadius = 0.3f;
@@ -62,12 +66,14 @@ public sealed class ArcadeVehicleController : MonoBehaviour
         ApplyLateralFriction();
 
         if (_isBraking) ApplyBrake();
+
+        ApplyStabilization();
     }
 
     // --- INPUTS ---
     public void RespondToMoveInput(InputAction.CallbackContext context) => _movementInput = context.ReadValue<Vector2>();
     public void RespondToBrakeInput(InputAction.CallbackContext context) => _isBraking = context.ReadValueAsButton();
-    public void RespondToBoostInput(InputAction.CallbackContext context) => _isNitroPressed = context.ReadValueAsButton(); // NUEVO INPUT
+    public void RespondToBoostInput(InputAction.CallbackContext context) => _isNitroPressed = context.ReadValueAsButton();
 
     public void RespondToJumpInput(InputAction.CallbackContext context)
     {
@@ -89,12 +95,10 @@ public sealed class ArcadeVehicleController : MonoBehaviour
     // --- LÓGICA DE ENERGÍA ---
     private void ManageGravityState()
     {
-        // Si estamos en gravedad terrestre, drenar energía constantemente
         if (!_isLunarGravity)
         {
             if (!_resourceComponent.TryConsumeContinuous(earthGravityCostPerSecond))
             {
-                // Si nos quedamos sin energía, forzar gravedad lunar
                 _isLunarGravity = true;
                 _currentGravity = lunarGravity;
                 Debug.Log("Gravedad forzada a Lunar: ¡Falta de energía!");
@@ -104,7 +108,6 @@ public sealed class ArcadeVehicleController : MonoBehaviour
 
     private bool ManageNitroState()
     {
-        // Solo podemos usar nitro si apretamos el botón Y estamos acelerando hacia adelante
         if (_isNitroPressed && _movementInput.y > 0)
         {
             return _resourceComponent.TryConsumeContinuous(nitroCostPerSecond);
@@ -115,7 +118,6 @@ public sealed class ArcadeVehicleController : MonoBehaviour
     // --- FÍSICAS MODIFICADAS ---
     private void ApplyAcceleration(bool isBoosting)
     {
-        // Multiplicar valores si el nitro está activo
         float currentAccel = isBoosting ? acceleration * nitroAccelMultiplier : acceleration;
         float currentMaxSpeed = isBoosting ? maximumForwardSpeed * nitroSpeedMultiplier : maximumForwardSpeed;
 
@@ -154,6 +156,24 @@ public sealed class ArcadeVehicleController : MonoBehaviour
     private void ApplyCustomGravity()
     {
         _rigidbody.AddForce(Vector3.up * _currentGravity, ForceMode.Acceleration);
+    }
+
+    private void ApplyStabilization()
+    {
+        Vector3 targetUp = Vector3.up;
+
+        if (IsGrounded() && Physics.Raycast(groundCheck.position, -transform.up, out RaycastHit hit, groundRadius + 0.5f, groundLayer))
+        {
+            targetUp = hit.normal;
+        }
+
+        Vector3 projectedForward = Vector3.ProjectOnPlane(transform.forward, targetUp).normalized;
+
+        if (projectedForward.sqrMagnitude > 0.001f)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(projectedForward, targetUp);
+            _rigidbody.MoveRotation(Quaternion.Slerp(_rigidbody.rotation, targetRotation, stabilizationSpeed * Time.fixedDeltaTime));
+        }
     }
 
     private bool IsGrounded()
