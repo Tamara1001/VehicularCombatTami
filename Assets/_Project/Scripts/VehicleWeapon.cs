@@ -31,6 +31,9 @@ public sealed class VehicleWeapon : MonoBehaviour
     /// </summary>
     public event Action<int, int> OnAmmoChanged;
 
+    // Propiedad pública para que la IA sepa desde dónde sale el disparo
+    public Transform FirePoint => firePoint;
+
     private void Awake()
     {
         CreatePool();
@@ -48,10 +51,9 @@ public sealed class VehicleWeapon : MonoBehaviour
         _projectilePool?.Clear();
     }
 
-    // --- INPUTS ---
+    // --- INPUTS (Solo para el Jugador) ---
     public void RespondToFireInput(InputAction.CallbackContext context)
     {
-        // context.performed detecta el clic. 
         if (context.performed)
         {
             TryFire();
@@ -67,17 +69,8 @@ public sealed class VehicleWeapon : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// AI-facing fire entry point. Equivalent to pulling the trigger
-    /// without requiring an InputAction.CallbackContext wrapper.
-    /// Called by AI controllers (e.g. EnemyShooter) on their own
-    /// fire-rate timers. Internally delegates to the same TryFire()
-    /// logic used by player input, keeping a single code path.
-    /// </summary>
-    public void TryFireAI() => TryFire();
-
-    // --- LÓGICA DE DISPARO ---
-    private void TryFire()
+    // --- LÓGICA DE DISPARO (Compartida por Jugador e IA) ---
+    public void TryFire()
     {
         if (_isReloading) return;
         if (Time.time < _lastFireTime + fireRate) return;

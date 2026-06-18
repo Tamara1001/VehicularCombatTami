@@ -92,6 +92,29 @@ public sealed class ArcadeVehicleController : MonoBehaviour
         }
     }
 
+    // --- PUENTE PARA LA IA ---
+    public float CurrentSpeed
+    {
+        get
+        {
+            Vector3 velocity = _rigidbody.linearVelocity;
+            velocity.y = 0f;
+            return velocity.magnitude;
+        }
+    }
+
+    public void SetAIInput(float steering, float throttle, bool brake)
+    {
+        _movementInput = new Vector2(steering, throttle);
+        _isBraking = brake;
+    }
+
+    public void ClearAIInput()
+    {
+        _movementInput = Vector2.zero;
+        _isBraking = false;
+    }
+
     // --- LÓGICA DE ENERGÍA ---
     private void ManageGravityState()
     {

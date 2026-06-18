@@ -131,7 +131,7 @@ MonoBehaviour:
   damage: 10
   ignoreLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
 --- !u!54 &8334006751638881894
 Rigidbody:
   m_ObjectHideFlags: 0

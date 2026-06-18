@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 6316597626893403058}
   - component: {fileID: 3723983412438941004}
   - component: {fileID: 4640967301970202496}
+  - component: {fileID: -2164788460882930578}
   m_Layer: 7
   m_Name: EnemyBase
   m_TagString: Untagged
@@ -147,6 +148,41 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.4
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &-2164788460882930578
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1826610566561443437}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d39a226f3d3f3e844af7851b63273ef4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CombatVehicleAI
+  vehicleController: {fileID: 2408058298049813889}
+  vehicleWeapon: {fileID: 2310848364422163787}
+  target: {fileID: 0}
+  sensorOrigin: {fileID: 5094263016476311728}
+  minimumAttackDistance: 7
+  preferredAttackDistance: 14
+  maximumAttackDistance: 24
+  maximumFireAngle: 8
+  attackSideOffset: 6
+  lineOfSightMask:
+    serializedVersion: 2
+    m_Bits: 0
+  steeringNormalizationAngle: 45
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 256
+  sensorDistance: 5
+  sideSensorAngle: 30
+  avoidanceStrength: 1.25
+  stuckSpeedThreshold: 0.5
+  stuckDetectionTime: 1.5
+  recoveryDuration: 1.25
+  currentState: 0
 --- !u!1 &1935900369925427118
 GameObject:
   m_ObjectHideFlags: 0
@@ -157,7 +193,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1389200243423325478}
   - component: {fileID: 2310848364422163787}
-  - component: {fileID: 4265370723569956175}
+  - component: {fileID: 5214698904588113802}
   m_Layer: 7
   m_Name: VehicleWeapon
   m_TagString: Untagged
@@ -201,7 +237,7 @@ MonoBehaviour:
   reloadTime: 1.5
   poolDefaultCapacity: 10
   poolMaxSize: 30
---- !u!114 &4265370723569956175
+--- !u!114 &5214698904588113802
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -210,13 +246,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1935900369925427118}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b4fd983b6e2a1e847a27fbeea56e4bd7, type: 3}
+  m_Script: {fileID: 11500000, guid: e926b7f0f9b20694296d3445ebe2f2f2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TurretAim
-  mainCamera: {fileID: 0}
-  aimMask:
-    serializedVersion: 2
-    m_Bits: 0
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyTurretAim
+  rotationSpeed: 120
 --- !u!1 &6035300313583540270
 GameObject:
   m_ObjectHideFlags: 0
