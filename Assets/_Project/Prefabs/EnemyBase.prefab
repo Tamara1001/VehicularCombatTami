@@ -171,7 +171,7 @@ MonoBehaviour:
   attackSideOffset: 6
   lineOfSightMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 320
   steeringNormalizationAngle: 45
   obstacleMask:
     serializedVersion: 2
