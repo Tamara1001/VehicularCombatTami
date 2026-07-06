@@ -9,8 +9,16 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: -2164788460882930578, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
+      propertyPath: enemyType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -2164788460882930578, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
       propertyPath: vehicleWeapon
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: -2164788460882930578, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
+      propertyPath: kamikazeChargeThrottle
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1826610566561443437, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
       propertyPath: m_Name

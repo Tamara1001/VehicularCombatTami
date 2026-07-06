@@ -66,8 +66,8 @@ public sealed class CombatVehicleAI : MonoBehaviour
     private float maximumAttackDistance = 24f;
 
     [SerializeField]
-    [Tooltip("Maximum angle allowed before firing.")]
-    private float maximumFireAngle = 8f;
+    [Tooltip("Maximum angle allowed before firing. Widened to 15° to accommodate the predictive aiming offset from EnemyTurretAim.")]
+    private float maximumFireAngle = 15f;
 
     [SerializeField]
     [Tooltip("Lateral distance used when circling the player.")]
@@ -121,7 +121,6 @@ public sealed class CombatVehicleAI : MonoBehaviour
     private float recoveryDirection = 1f;
     private float recoveryTimer;
     private float stuckTimer;
-    private float lastThrottleInput;
 
     private void Awake()
     {
@@ -367,10 +366,16 @@ public sealed class CombatVehicleAI : MonoBehaviour
             return;
         }
 
+        // Flatten both vectors onto the horizontal plane before comparing so that
+        // the turret's vertical tilt (from ramps or the predictive aim offset) does
+        // not artificially inflate the angle and prevent the weapon from firing.
         Vector3 directionToTarget = target.position - vehicleWeapon.FirePoint.position;
         directionToTarget.y = 0f;
 
-        float angleToTarget = Vector3.Angle(vehicleWeapon.FirePoint.forward, directionToTarget);
+        Vector3 flatFireForward = vehicleWeapon.FirePoint.forward;
+        flatFireForward.y = 0f;
+
+        float angleToTarget = Vector3.Angle(flatFireForward, directionToTarget);
 
         if (angleToTarget <= maximumFireAngle && HasLineOfSight())
         {
@@ -399,10 +404,16 @@ public sealed class CombatVehicleAI : MonoBehaviour
 
     private void UpdateStuckDetection()
     {
-        bool isTryingToMove = Mathf.Abs(lastThrottleInput) > 0.5f;
+        // Gate on states where the vehicle is actively expected to be moving.
+        // This avoids false positives during Reposition (which can legitimately
+        // crawl) and eliminates the old lastThrottleInput gate that obstacle
+        // avoidance would suppress by clamping the throttle to 0.25f.
+        bool isActiveMovementState = currentState == VehicleAIState.Pursue ||
+                                     currentState == VehicleAIState.Attack;
+
         bool isAlmostStopped = vehicleController.CurrentSpeed < stuckSpeedThreshold;
 
-        if (isTryingToMove && isAlmostStopped)
+        if (isActiveMovementState && isAlmostStopped)
         {
             stuckTimer += Time.fixedDeltaTime;
         }
@@ -435,13 +446,11 @@ public sealed class CombatVehicleAI : MonoBehaviour
 
     private void ApplyVehicleInput(float steering, float throttle, bool brake)
     {
-        lastThrottleInput = throttle;
         vehicleController.SetAIInput(steering, throttle, brake);
     }
 
     private void StopVehicle()
     {
-        lastThrottleInput = 0f;
         if (vehicleController != null)
         {
             vehicleController.SetAIInput(0f, 0f, true);

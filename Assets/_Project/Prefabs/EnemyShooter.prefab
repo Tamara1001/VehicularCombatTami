@@ -8,9 +8,21 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -2164788460882930578, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
+      propertyPath: currentState
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -2164788460882930578, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
+      propertyPath: maximumFireAngle
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: -2164788460882930578, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
+      propertyPath: kamikazeChargeThrottle
+      value: 1.5
+      objectReference: {fileID: 0}
     - target: {fileID: 1826610566561443437, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
       propertyPath: m_Name
-      value: EnemyBase
+      value: EnemyShooter
       objectReference: {fileID: 0}
     - target: {fileID: 7221148531037032002, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
       propertyPath: m_LocalPosition.x

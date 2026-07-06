@@ -83,7 +83,7 @@ MonoBehaviour:
   acceleration: 35
   maximumForwardSpeed: 18
   maximumReverseSpeed: 8
-  turnSpeed: 80
+  turnSpeed: 120
   lateralFriction: 8
   brakeForce: 18
   nitroSpeedMultiplier: 1.6
