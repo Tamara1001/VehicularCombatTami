@@ -160,6 +160,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d39a226f3d3f3e844af7851b63273ef4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CombatVehicleAI
+  enemyType: 0
+  kamikazeChargeThrottle: 1.5
   vehicleController: {fileID: 2408058298049813889}
   vehicleWeapon: {fileID: 2310848364422163787}
   target: {fileID: 0}
@@ -176,7 +178,7 @@ MonoBehaviour:
   obstacleMask:
     serializedVersion: 2
     m_Bits: 256
-  sensorDistance: 5
+  sensorDistance: 12
   sideSensorAngle: 30
   avoidanceStrength: 1.25
   stuckSpeedThreshold: 0.5

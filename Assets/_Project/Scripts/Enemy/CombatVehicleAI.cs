@@ -6,6 +6,17 @@ using UnityEngine;
 /// </summary>
 public sealed class CombatVehicleAI : MonoBehaviour
 {
+    /// <summary>
+    /// Determines the high-level combat personality of this enemy vehicle.
+    /// </summary>
+    public enum EnemyType
+    {
+        /// <summary>Orbits the player and fires its weapon.</summary>
+        Shooter,
+        /// <summary>Charges directly at the player to ram it.</summary>
+        Kamikaze
+    }
+
     private enum VehicleAIState
     {
         Pursue,
@@ -13,6 +24,16 @@ public sealed class CombatVehicleAI : MonoBehaviour
         Reposition,
         Recover
     }
+
+    [Header("Enemy Type")]
+    [SerializeField]
+    [Tooltip("Shooter orbits the player and fires. Kamikaze charges directly to ram.")]
+    private EnemyType enemyType = EnemyType.Shooter;
+
+    [Header("Kamikaze Settings")]
+    [SerializeField]
+    [Tooltip("Throttle multiplier applied during the Kamikaze charge. Values above 1 allow it to exceed the normal speed cap.")]
+    private float kamikazeChargeThrottle = 1.5f;
 
     [Header("References")]
     [SerializeField]
@@ -195,6 +216,24 @@ public sealed class CombatVehicleAI : MonoBehaviour
 
     private void ExecuteAttack()
     {
+        switch (enemyType)
+        {
+            case EnemyType.Shooter:
+                ExecuteShooterAttack();
+                break;
+
+            case EnemyType.Kamikaze:
+                ExecuteKamikazeAttack();
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Shooter attack: calculates an orbital position offset to the side of the
+    /// player and drives towards it while attempting to fire.
+    /// </summary>
+    private void ExecuteShooterAttack()
+    {
         Vector3 directionAwayFromTarget = transform.position - target.position;
         directionAwayFromTarget.y = 0f;
 
@@ -212,6 +251,15 @@ public sealed class CombatVehicleAI : MonoBehaviour
 
         DriveTowards(attackPosition, 0.65f);
         TryFireAtTarget();
+    }
+
+    /// <summary>
+    /// Kamikaze attack: ignores orbital math entirely and charges straight at the
+    /// player using an aggressive throttle multiplier. Never fires its weapon.
+    /// </summary>
+    private void ExecuteKamikazeAttack()
+    {
+        DriveTowards(target.position, kamikazeChargeThrottle);
     }
 
     private void ExecuteReposition()
