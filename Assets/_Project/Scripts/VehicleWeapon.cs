@@ -34,6 +34,20 @@ public sealed class VehicleWeapon : MonoBehaviour
     // Propiedad pública para que la IA sepa desde dónde sale el disparo
     public Transform FirePoint => firePoint;
 
+    // Target assigned by the AI for homing projectiles.
+    // Null when fired by the player (homing is handled per-projectile).
+    private Transform _currentTarget;
+
+    /// <summary>
+    /// Sets the homing target used by the next AI-fired projectile.
+    /// Call this before TryFire(). Passing null clears the target so the
+    /// projectile flies straight (player-fired shots are always straight).
+    /// </summary>
+    public void SetAITarget(Transform target)
+    {
+        _currentTarget = target;
+    }
+
     private void Awake()
     {
         CreatePool();
@@ -113,7 +127,10 @@ public sealed class VehicleWeapon : MonoBehaviour
 
     private void FireProjectile()
     {
-        _projectilePool.Get();
+        // Get() calls OnGetProjectile which positions and activates the projectile.
+        // We then pass the current AI target so homing projectiles know who to chase.
+        Projectile projectile = _projectilePool.Get();
+        projectile.SetTarget(_currentTarget);
     }
 
     // --- MÉTODOS DEL POOL ---

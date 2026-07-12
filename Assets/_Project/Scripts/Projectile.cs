@@ -3,18 +3,30 @@ using UnityEngine;
 using UnityEngine.Pool;
 
 /// <summary>
-/// Proyectil balístico gestionado por un ObjectPool.
-/// Se mueve en línea recta y aplica daño a cualquier IDamageable que toque.
+/// Ballistic projectile managed by an ObjectPool.
+/// Supports an optional homing phase that steers toward a target for a
+/// configurable duration before continuing in a straight line.
+/// Applies damage to any IDamageable on trigger contact.
 /// </summary>
 [RequireComponent(typeof(Collider))]
 public sealed class Projectile : MonoBehaviour
 {
     [Header("Motion")]
-    [Tooltip("Velocidad de viaje del proyectil hacia adelante.")]
+    [Tooltip("Forward travel speed of the projectile.")]
     [SerializeField] private float projectileSpeed = 18f;
 
-    [Tooltip("Tiempo máximo de vida antes de volver al Pool.")]
+    [Tooltip("Maximum lifetime before returning to the Pool.")]
     [SerializeField] private float lifetime = 4f;
+
+    [Header("Homing")]
+    [Tooltip("When true the projectile steers toward its assigned target for homingDuration seconds.")]
+    [SerializeField] private bool isHoming = false;
+
+    [Tooltip("Seconds the projectile actively homes before flying straight.")]
+    [SerializeField] private float homingDuration = 3f;
+
+    [Tooltip("Degrees per second the projectile can turn while homing.")]
+    [SerializeField] private float homingTurnSpeed = 90f;
 
     [Header("Combat Settings")]
     [Tooltip("Daño que aplica el proyectil al impactar.")]
@@ -28,6 +40,7 @@ public sealed class Projectile : MonoBehaviour
     private float _activeTimer;
     private Transform _transform;
     private bool _isReturned;
+    private Transform _homingTarget;
 
     private void Awake()
     {
@@ -42,8 +55,25 @@ public sealed class Projectile : MonoBehaviour
         }
     }
 
+    // --- PUBLIC HOMING API ---
+
+    /// <summary>
+    /// Assigns a target for the homing phase. Call this immediately after
+    /// retrieving the projectile from the pool (before it moves).
+    /// Passing null disables homing for this flight.
+    /// </summary>
+    public void SetTarget(Transform newTarget)
+    {
+        _homingTarget = newTarget;
+    }
+
     private void Update()
     {
+        if (isHoming && _activeTimer < homingDuration && _homingTarget != null)
+        {
+            SteerTowardsTarget();
+        }
+
         MoveForward();
         CheckLifetime();
     }
@@ -59,15 +89,36 @@ public sealed class Projectile : MonoBehaviour
     {
         _isReturned = false;
         _activeTimer = 0f;
+        _homingTarget = null;   // Caller sets target via SetTarget() after retrieval.
         gameObject.SetActive(true);
     }
 
     public void OnReturnToPool()
     {
+        _homingTarget = null;   // Release reference so the target GC can collect.
         gameObject.SetActive(false);
     }
 
-    // --- LÓGICA DE MOVIMIENTO ---
+    // --- MOVEMENT ---
+
+    /// <summary>
+    /// Rotates the projectile toward the homing target's chassis centre
+    /// (offset 0.5 m up) at homingTurnSpeed degrees per second.
+    /// Called only during the active homing window.
+    /// </summary>
+    private void SteerTowardsTarget()
+    {
+        Vector3 targetCenter = _homingTarget.position + Vector3.up * 0.5f;
+        Vector3 directionToTarget = targetCenter - _transform.position;
+
+        if (directionToTarget.sqrMagnitude < 0.001f) return;
+
+        Quaternion targetRotation = Quaternion.LookRotation(directionToTarget);
+        _transform.rotation = Quaternion.RotateTowards(
+            _transform.rotation,
+            targetRotation,
+            homingTurnSpeed * Time.deltaTime);
+    }
 
     private void MoveForward()
     {

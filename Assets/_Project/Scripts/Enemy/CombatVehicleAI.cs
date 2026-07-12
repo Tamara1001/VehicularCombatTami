@@ -66,8 +66,8 @@ public sealed class CombatVehicleAI : MonoBehaviour
     private float maximumAttackDistance = 24f;
 
     [SerializeField]
-    [Tooltip("Maximum angle allowed before firing. Widened to 15° to accommodate the predictive aiming offset from EnemyTurretAim.")]
-    private float maximumFireAngle = 15f;
+    [Tooltip("Maximum angle (degrees) between the turret forward and the target direction before firing. 30\u00b0 gives a generous arcade window that works reliably with homing projectiles.")]
+    private float maximumFireAngle = 30f;
 
     [SerializeField]
     [Tooltip("Lateral distance used when circling the player.")]
@@ -366,19 +366,21 @@ public sealed class CombatVehicleAI : MonoBehaviour
             return;
         }
 
-        // Flatten both vectors onto the horizontal plane before comparing so that
-        // the turret's vertical tilt (from ramps or the predictive aim offset) does
-        // not artificially inflate the angle and prevent the weapon from firing.
-        Vector3 directionToTarget = target.position - vehicleWeapon.FirePoint.position;
-        directionToTarget.y = 0f;
-
+        // Simple flat-angle check: flatten both the turret forward and the
+        // direction to the target onto the horizontal plane, then compare.
+        // The homing system handles correction after launch, so we only need
+        // a generous cone check to confirm the shot is roughly on-axis.
         Vector3 flatFireForward = vehicleWeapon.FirePoint.forward;
         flatFireForward.y = 0f;
+
+        Vector3 directionToTarget = target.position - vehicleWeapon.FirePoint.position;
+        directionToTarget.y = 0f;
 
         float angleToTarget = Vector3.Angle(flatFireForward, directionToTarget);
 
         if (angleToTarget <= maximumFireAngle && HasLineOfSight())
         {
+            vehicleWeapon.SetAITarget(target);
             vehicleWeapon.TryFire();
         }
     }
@@ -454,6 +456,29 @@ public sealed class CombatVehicleAI : MonoBehaviour
         if (vehicleController != null)
         {
             vehicleController.SetAIInput(0f, 0f, true);
+        }
+    }
+
+    // ----------------------------------------------------------
+    // KAMIKAZE — COLLISION DAMAGE
+    // ----------------------------------------------------------
+
+    [Header("Kamikaze Combat")]
+    [SerializeField]
+    [Tooltip("Damage applied to any IDamageable hit by the Kamikaze chassis on collision.")]
+    private int ramDamage = 20;
+
+    /// <summary>
+    /// Applies ram damage to any IDamageable the Kamikaze chassis collides with.
+    /// Shooter enemies are excluded; they rely solely on projectile damage.
+    /// </summary>
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (enemyType != EnemyType.Kamikaze) return;
+
+        if (collision.gameObject.TryGetComponent<IDamageable>(out IDamageable damageable))
+        {
+            damageable.TakeDamage(ramDamage);
         }
     }
 

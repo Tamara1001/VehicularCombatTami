@@ -1127,6 +1127,10 @@ PrefabInstance:
       value: EnemyShooter
       objectReference: {fileID: 0}
     - target: {fileID: 8659903583518471796, guid: 4a4d7176e69fa304b924585b858b81c3, type: 3}
+      propertyPath: target
+      value: 
+      objectReference: {fileID: 297877873}
+    - target: {fileID: 8659903583518471796, guid: 4a4d7176e69fa304b924585b858b81c3, type: 3}
       propertyPath: lineOfSightMask.m_Bits
       value: 320
       objectReference: {fileID: 0}
@@ -1421,6 +1425,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3879221033319923526, guid: d2111929fd437cd48bf3991c196319fa, type: 3}
+      propertyPath: target
+      value: 
+      objectReference: {fileID: 297877873}
     - target: {fileID: 5582649372705424709, guid: d2111929fd437cd48bf3991c196319fa, type: 3}
       propertyPath: m_Name
       value: EnemyKamikaze
