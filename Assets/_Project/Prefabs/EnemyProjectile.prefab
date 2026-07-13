@@ -128,9 +128,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Projectile
   projectileSpeed: 18
   lifetime: 4
-  isHoming: 1
-  homingDuration: 3
-  homingTurnSpeed: 90
   damage: 10
   ignoreLayers:
     serializedVersion: 2
