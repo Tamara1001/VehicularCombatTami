@@ -24,17 +24,21 @@ PrefabInstance:
       propertyPath: m_Name
       value: EnemyKamikaze
       objectReference: {fileID: 0}
+    - target: {fileID: 4640967301970202496, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7221148531037032002, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -25.319061
       objectReference: {fileID: 0}
     - target: {fileID: 7221148531037032002, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -1.8829014
       objectReference: {fileID: 0}
     - target: {fileID: 7221148531037032002, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 21.664095
       objectReference: {fileID: 0}
     - target: {fileID: 7221148531037032002, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
       propertyPath: m_LocalRotation.w
@@ -64,9 +68,108 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: -2164788460882930578, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
+    - {fileID: 2408058298049813889, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
+    - {fileID: 6316597626893403058, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
     m_RemovedGameObjects:
     - {fileID: 1935900369925427118, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1826610566561443437, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1647948382194333687}
+    - targetCorrespondingSourceObject: {fileID: 1826610566561443437, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4029078637711028436}
+    - targetCorrespondingSourceObject: {fileID: 1826610566561443437, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8060912520615800825}
   m_SourcePrefab: {fileID: 100100000, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
+--- !u!1 &5582649372705424709 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1826610566561443437, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
+  m_PrefabInstance: {fileID: 6062094306795367208}
+  m_PrefabAsset: {fileID: 0}
+--- !u!135 &1647948382194333687
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5582649372705424709}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.2
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!195 &4029078637711028436
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5582649372705424709}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
+--- !u!114 &8060912520615800825
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5582649372705424709}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54b3d85cd7ba3494ea39ae3bb8da5527, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyKamikaze
+  acceleration: 25
+  maximumChaseSpeed: 14
+  maximumPatrolSpeed: 7
+  turnSpeed: 90
+  lateralFriction: 6
+  customGravity: -1.62
+  baseChaseRadius: 80
+  baseAttackRange: 8
+  loseTargetRadius: 120
+  patrolRadius: 15
+  patrolIdleDuration: 2
+  stunDuration: 3
+  stuckSpeedThreshold: 0.5
+  stuckDetectionTime: 1.5
+  recoverReverseDuration: 1.2
+  telegraphDuration: 0.75
+  telegraphTurnSpeed: 120
+  OnTelegraphStart:
+    m_PersistentCalls:
+      m_Calls: []
+  chargeVelocity: 28
+  chargeTimeoutDuration: 3
+  ramDamage: 40
+  bounceBackForce: 18
+  environmentLayerMask:
+    serializedVersion: 2
+    m_Bits: 256

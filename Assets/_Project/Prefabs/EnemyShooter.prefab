@@ -28,6 +28,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: EnemyShooter
       objectReference: {fileID: 0}
+    - target: {fileID: 2310848364422163787, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
+      propertyPath: maxAmmo
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2310848364422163787, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
+      propertyPath: fireRate
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2310848364422163787, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
+      propertyPath: reloadTime
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2310848364422163787, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
+      propertyPath: projectilePrefab
+      value: 
+      objectReference: {fileID: 425785706368802629, guid: 701b4ddd144fb6f4cab31a398df5077b, type: 3}
     - target: {fileID: 7221148531037032002, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -38,7 +54,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7221148531037032002, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -30
       objectReference: {fileID: 0}
     - target: {fileID: 7221148531037032002, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
       propertyPath: m_LocalRotation.w

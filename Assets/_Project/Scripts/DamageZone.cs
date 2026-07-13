@@ -71,9 +71,12 @@ public class DamageZone : MonoBehaviour
     // UNITY LIFECYCLE — TRIGGER EVENTS
     //
     // PERFORMANCE NOTE:
-    //   IDamageable is fetched ONCE in OnTriggerEnter and cached
-    //   in the Dictionary. OnTriggerStay reads from the cache,
-    //   meaning zero GetComponent calls happen during the update loop.
+    //   IDamageable is resolved ONCE in OnTriggerEnter via
+    //   GetComponentInParent, which walks up the hierarchy so that
+    //   child colliders correctly reach a HealthComponent on the
+    //   parent root. The Collider itself (not the root) is stored
+    //   as the dictionary key so each collider keeps its own
+    //   independent cooldown timer.
     // ----------------------------------------------------------
 
     /// <summary>
@@ -84,12 +87,17 @@ public class DamageZone : MonoBehaviour
     /// <param name="other">The Collider that entered the trigger.</param>
     private void OnTriggerEnter(Collider other)
     {
-        // Only track colliders that belong to a damageable entity.
-        // GetComponent is called here (on enter) — NOT in Stay.
-        if (other.TryGetComponent<IDamageable>(out _))
+        // Walk UP the hierarchy from the entering collider's GameObject
+        // so that child colliders can still resolve an IDamageable that
+        // lives on a parent (e.g. HealthComponent on the vehicle root).
+        // GetComponentInParent also checks the object itself, so this is
+        // a strict superset of the old TryGetComponent call.
+        if (other.GetComponentInParent<IDamageable>() != null)
         {
             // Register with an initial next-damage time of NOW so
             // the first tick fires immediately on the first Stay frame.
+            // Key = the specific Collider to keep independent cooldowns
+            // when an entity has multiple colliders in the zone.
             if (!nextDamageTimeMap.ContainsKey(other))
             {
                 nextDamageTimeMap[other] = Time.time;
@@ -113,11 +121,18 @@ public class DamageZone : MonoBehaviour
         // Check if the cooldown for this specific entity has elapsed.
         if (Time.time < nextDamageTime) return;
 
-        // Cooldown has elapsed — attempt to get the interface and deal damage.
-        // TryGetComponent is safe here; it avoids a null-check antipattern.
-        if (other.TryGetComponent<IDamageable>(out IDamageable damageable))
+        // Cooldown has elapsed — resolve the interface by walking up the
+        // hierarchy so that child-collider entities (player, AI vehicles)
+        // whose HealthComponent sits on the parent root are found correctly.
+        IDamageable damageable = other.GetComponentInParent<IDamageable>();
+        if (damageable != null)
         {
             damageable.TakeDamage(damageAmount);
+
+            // ── TEMPORARY DIAGNOSTIC ──────────────────────────────────────
+            // Confirms hierarchy detection is working. Remove once verified.
+            Debug.Log($"🔥 [DamageZone] Damage applied to: {other.transform.root.name}");
+            // ─────────────────────────────────────────────────────────────
 
             // Schedule the NEXT tick for this collider.
             nextDamageTimeMap[other] = Time.time + damageTickRate;

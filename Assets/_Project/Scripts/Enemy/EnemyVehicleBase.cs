@@ -58,12 +58,25 @@
 //      Rigidbody collision nudges the vehicle slightly off the baked
 //      NavMesh surface (common on ramps and crater edges).
 //
+// MODIFICATIONS v4 (backward-compatible, additive):
+//   [PATCH-2] EnemyState.Recover — Stuck-vehicle recovery system:
+//      A lightweight stuck-detection timer runs inside FixedUpdate
+//      whenever ShouldUseNavMeshLocomotion() is true. If the vehicle
+//      speed drops below stuckSpeedThreshold for stuckDetectionTime
+//      seconds, the FSM transitions to Recover. The RecoverRoutine
+//      applies a reverse force (-acceleration) for recoverReverseDuration
+//      seconds, clears the NavMesh path, then transitions back to Chase.
+//      This replaces the equivalent logic that existed in CombatVehicleAI
+//      before EnemyVehicleBase was adopted. No child class changes are
+//      required — all existing overrides continue to work unchanged.
+//
 // CHILD CLASS RESPONSIBILITIES:
 //   Override the following virtual methods to specialise behavior:
 //     • OnPatrolUpdate()   – custom patrol waypoint logic
 //     • OnChaseUpdate()    – optional chase tweaks (e.g. flanking)
 //     • OnAttackUpdate()   – REQUIRED: implement the attack pattern
 //     • OnStunnedUpdate()  – optional stun effects (sparks, etc.)
+//     • OnRecoverUpdate()  – optional recover effects (sparks, etc.)
 //     • OnStateEntered()   – react to any state entry
 //     • OnStateExited()    – clean up on state exit
 //     • GetChaseDetectionRadius() – per-enemy tunable range
@@ -92,7 +105,13 @@ public enum EnemyState
     Attack,
 
     /// <summary>Temporarily disabled (e.g., hit by EMP).</summary>
-    Stunned
+    Stunned,
+
+    /// <summary>
+    /// Vehicle is stuck against geometry; applying reverse thrust to
+    /// free itself before returning to Chase.
+    /// </summary>
+    Recover
 }
 
 /// <summary>
@@ -155,6 +174,25 @@ public abstract class EnemyVehicleBase : MonoBehaviour
     [Header("Stun")]
     [Tooltip("Stun duration in seconds when EnterStunned() is called externally.")]
     [SerializeField] private float stunDuration = 3f;
+
+    // ----------------------------------------------------------
+    // INSPECTOR — RECOVER [PATCH-2]
+    // ----------------------------------------------------------
+
+    [Header("Recover — Stuck Detection")]
+
+    [Tooltip("Speed (m/s) below which the vehicle is considered stuck. " +
+             "Must be below normal patrol/chase speeds to avoid false positives.")]
+    [SerializeField] private float stuckSpeedThreshold = 0.5f;
+
+    [Tooltip("Seconds the vehicle must remain below stuckSpeedThreshold before " +
+             "the Recover state is triggered. A short fuse (1–2 s) catches real " +
+             "corner-clips without triggering on intentional deceleration.")]
+    [SerializeField] private float stuckDetectionTime = 1.5f;
+
+    [Tooltip("Duration (seconds) of the reverse-thrust recovery maneuver before " +
+             "the vehicle transitions back to Chase.")]
+    [SerializeField] private float recoverReverseDuration = 1.2f;
 
     // ----------------------------------------------------------
     // PROTECTED REFERENCES
@@ -223,6 +261,23 @@ public abstract class EnemyVehicleBase : MonoBehaviour
 
     /// <summary>Running stun timer coroutine reference so it can be cancelled early.</summary>
     private Coroutine _stunCoroutine;
+
+    // ----------------------------------------------------------
+    // PRIVATE STATE — RECOVER [PATCH-2]
+    // ----------------------------------------------------------
+
+    /// <summary>
+    /// Accumulates the time (seconds) the vehicle has been below
+    /// <see cref="stuckSpeedThreshold"/> while in a locomotion state.
+    /// Resets to zero the moment the vehicle exceeds the threshold again.
+    /// </summary>
+    private float _stuckTimer;
+
+    /// <summary>
+    /// Reference to the running recover coroutine so it can be cancelled
+    /// if the enemy dies or is externally stunned mid-recovery.
+    /// </summary>
+    private Coroutine _recoverCoroutine;
 
     // ----------------------------------------------------------
     // PUBLIC EVENTS (Observer Pattern)
@@ -301,6 +356,13 @@ public abstract class EnemyVehicleBase : MonoBehaviour
             case EnemyState.Stunned:
                 OnStunnedUpdate();
                 break;
+
+            // [PATCH-2] Recover is driven entirely by RecoverRoutine (coroutine).
+            // The virtual hook lets child classes add cosmetic effects (sparks, etc.)
+            // without needing to know about the coroutine internals.
+            case EnemyState.Recover:
+                OnRecoverUpdate();
+                break;
         }
     }
 
@@ -318,6 +380,11 @@ public abstract class EnemyVehicleBase : MonoBehaviour
         // orbit movement still runs through the same NavMesh pipeline.
         if (ShouldUseNavMeshLocomotion())
         {
+            // [PATCH-2] Accumulate stuck time while actively navigating.
+            // Must run BEFORE DriveTowardsNextCorner so we can detect the
+            // case where the path exists but the vehicle isn't actually moving.
+            UpdateStuckDetection();
+
             RefreshNavPath();
             DriveTowardsNextCorner();
             ApplyLateralFriction();
@@ -325,6 +392,13 @@ public abstract class EnemyVehicleBase : MonoBehaviour
         else if (CurrentState == EnemyState.Stunned)
         {
             // Friction-only during stun: bleed off existing velocity.
+            ApplyLateralFriction();
+        }
+        else if (CurrentState == EnemyState.Recover)
+        {
+            // [PATCH-2] During recovery the coroutine applies the reverse
+            // force directly to Rb. We only need friction here to prevent
+            // the vehicle from drifting sideways while reversing.
             ApplyLateralFriction();
         }
     }
@@ -343,9 +417,11 @@ public abstract class EnemyVehicleBase : MonoBehaviour
     /// EnemyShooter returns true for Attack as well so the chassis continues
     /// orbiting while the turret fires.
     ///
-    /// IMPORTANT: returning true here enables full locomotion. The Stun
-    /// friction-only fallback in FixedUpdate is NOT gated by this method
-    /// and always runs when the state is Stunned regardless of this value.
+    /// IMPORTANT: returning true here enables full locomotion. The Stunned and
+    /// Recover states each have their own friction-only fallback in FixedUpdate
+    /// and are NOT gated by this method — they always run regardless of this value.
+    /// The stuck-detection timer (UpdateStuckDetection) only runs when this
+    /// returns true, so Recover and Stunned are never falsely flagged as stuck.
     /// </summary>
     /// <returns>True if the NavMesh locomotion pipeline should run this frame.</returns>
     protected virtual bool ShouldUseNavMeshLocomotion()
@@ -489,6 +565,13 @@ public abstract class EnemyVehicleBase : MonoBehaviour
     protected virtual void OnStunnedUpdate() { }
 
     /// <summary>
+    /// Called every frame while in Recover state. [PATCH-2]
+    /// The recovery physics are handled by <see cref="RecoverRoutine"/>;
+    /// override this only to add cosmetic effects (sparks, smoke, etc.).
+    /// </summary>
+    protected virtual void OnRecoverUpdate() { }
+
+    /// <summary>
     /// Called once immediately after transitioning INTO <paramref name="newState"/>.
     /// Override to play entry animations, sounds, or reset sub-state variables.
     /// Always call base.OnStateEntered(newState) if you override.
@@ -545,6 +628,96 @@ public abstract class EnemyVehicleBase : MonoBehaviour
         TransitionTo(EnemyState.Stunned);
         yield return new WaitForSeconds(stunDuration);
         _stunCoroutine = null;
+        TransitionTo(EnemyState.Chase);
+    }
+
+    // ----------------------------------------------------------
+    // RECOVER — STUCK DETECTION + RECOVERY COROUTINE [PATCH-2]
+    // Called from FixedUpdate while ShouldUseNavMeshLocomotion()
+    // is true (Patrol + Chase). Recover itself never re-triggers
+    // stuck detection because it returns false from the gate.
+    // ----------------------------------------------------------
+
+    /// <summary>
+    /// Increments <see cref="_stuckTimer"/> when the vehicle speed is
+    /// below <see cref="stuckSpeedThreshold"/>, or resets it when moving
+    /// normally. Triggers <see cref="EnterRecover"/> when the timer fires.
+    /// Called every FixedUpdate tick while NavMesh locomotion is active.
+    /// </summary>
+    private void UpdateStuckDetection()
+    {
+        // linearVelocity.magnitude is the true world-space speed.
+        // Using sqrMagnitude would require squaring the threshold, which
+        // is less readable for a designer-facing Inspector field.
+        float currentSpeed = Rb.linearVelocity.magnitude;
+
+        if (currentSpeed < stuckSpeedThreshold)
+        {
+            _stuckTimer += Time.fixedDeltaTime;
+
+            if (_stuckTimer >= stuckDetectionTime)
+            {
+                // Reset now so a back-to-back stun after recovery doesn't
+                // immediately re-trigger a second recovery cycle.
+                _stuckTimer = 0f;
+                EnterRecover();
+            }
+        }
+        else
+        {
+            // Vehicle is moving normally — reset the fuse.
+            _stuckTimer = 0f;
+        }
+    }
+
+    /// <summary>
+    /// Starts the recovery coroutine, cancelling any previously running
+    /// one to prevent double-coroutine stacking on rapid re-triggers.
+    /// Mirrors the pattern used by <see cref="EnterStunned"/>.
+    /// </summary>
+    private void EnterRecover()
+    {
+        if (_recoverCoroutine != null)
+            StopCoroutine(_recoverCoroutine);
+
+        _recoverCoroutine = StartCoroutine(RecoverRoutine());
+    }
+
+    /// <summary>
+    /// Reverse-thrust recovery sequence:
+    ///   1. Transition to Recover (stops NavMesh locomotion gate).
+    ///   2. Apply a backwards force for <see cref="recoverReverseDuration"/> seconds.
+    ///   3. Clear the NavMesh path so a fresh route is computed on return.
+    ///   4. Transition back to Chase.
+    /// </summary>
+    private IEnumerator RecoverRoutine()
+    {
+        TransitionTo(EnemyState.Recover);
+
+        float timer = 0f;
+
+        while (timer < recoverReverseDuration)
+        {
+            timer += Time.fixedDeltaTime;
+
+            // Apply reverse force capped at the chase speed to avoid
+            // rocketing backwards. ForceMode.Acceleration is frame-rate
+            // independent and matches how the forward drive is applied.
+            if (Rb.linearVelocity.magnitude < maximumChaseSpeed)
+            {
+                Rb.AddForce(-transform.forward * acceleration, ForceMode.Acceleration);
+            }
+
+            yield return new WaitForFixedUpdate();
+        }
+
+        // Clear the current path — it likely led into the obstacle that
+        // got us stuck. The next RefreshNavPath call will compute a fresh
+        // route from the vehicle's new, slightly reversed position.
+        _navPath.ClearCorners();
+        _currentCornerIndex = 0;
+
+        _recoverCoroutine = null;
         TransitionTo(EnemyState.Chase);
     }
 
