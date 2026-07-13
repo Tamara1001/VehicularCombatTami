@@ -14,11 +14,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -2164788460882930578, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
       propertyPath: maximumFireAngle
-      value: 15
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: -2164788460882930578, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
       propertyPath: kamikazeChargeThrottle
       value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1248739502161719326, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 1.27
       objectReference: {fileID: 0}
     - target: {fileID: 1826610566561443437, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
       propertyPath: m_Name
