@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 5185391126565254008}
   - component: {fileID: 425785706368802629}
   - component: {fileID: 8334006751638881894}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: EnemyProjectile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -128,6 +128,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Projectile
   projectileSpeed: 18
   lifetime: 4
+  isHoming: 1
+  homingTurnRate: 120
+  homingDuration: 3
   damage: 10
   ignoreLayers:
     serializedVersion: 2

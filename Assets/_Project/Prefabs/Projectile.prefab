@@ -126,8 +126,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c01e9706379c9954d947f8a716df921f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Projectile
-  projectileSpeed: 18
+  projectileSpeed: 50
   lifetime: 4
+  isHoming: 0
+  homingTurnRate: 180
+  homingDuration: 1.5
   damage: 10
   ignoreLayers:
     serializedVersion: 2

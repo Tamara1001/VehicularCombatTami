@@ -35,6 +35,10 @@ public sealed class CombatVehicleAI : MonoBehaviour
     [Tooltip("Throttle multiplier applied during the Kamikaze charge. Values above 1 allow it to exceed the normal speed cap.")]
     private float kamikazeChargeThrottle = 1.5f;
 
+    [SerializeField]
+    [Tooltip("Damage dealt to the target's IDamageable component on a successful ram collision.")]
+    private int ramDamage = 20;
+
     [Header("References")]
     [SerializeField]
     [Tooltip("Arcade vehicle controller used by the enemy.")]
@@ -66,8 +70,10 @@ public sealed class CombatVehicleAI : MonoBehaviour
     private float maximumAttackDistance = 24f;
 
     [SerializeField]
-    [Tooltip("Maximum angle allowed before firing. Widened to 15° to accommodate the predictive aiming offset from EnemyTurretAim.")]
-    private float maximumFireAngle = 15f;
+    [Tooltip("Maximum flat (horizontal-plane) angle between FirePoint.forward and the target " +
+             "before the weapon is allowed to fire. 30° gives the turret rotation a comfortable " +
+             "window while keeping shots reasonably on-target.")]
+    private float maximumFireAngle = 30f;
 
     [SerializeField]
     [Tooltip("Lateral distance used when circling the player.")]
@@ -148,6 +154,15 @@ public sealed class CombatVehicleAI : MonoBehaviour
                 target = playerObject.transform;
             }
         }
+
+        // Forward the player transform to the weapon so that homing projectiles
+        // spawned by this enemy automatically chase the correct target.
+        // For Kamikaze enemies vehicleWeapon may be null — the null-check is safe.
+        if (vehicleWeapon != null)
+        {
+            vehicleWeapon.SetAITarget(target);
+        }
+
         currentState = VehicleAIState.Pursue;
     }
 
@@ -366,20 +381,65 @@ public sealed class CombatVehicleAI : MonoBehaviour
             return;
         }
 
-        // Flatten both vectors onto the horizontal plane before comparing so that
-        // the turret's vertical tilt (from ramps or the predictive aim offset) does
-        // not artificially inflate the angle and prevent the weapon from firing.
+        // Project both vectors onto the horizontal plane so that vertical tilt
+        // from ramps or homing arcs does not inflate the measured angle and
+        // accidentally prevent the weapon from firing.
         Vector3 directionToTarget = target.position - vehicleWeapon.FirePoint.position;
         directionToTarget.y = 0f;
 
         Vector3 flatFireForward = vehicleWeapon.FirePoint.forward;
         flatFireForward.y = 0f;
 
+        // Guard against degenerate zero-length vectors (e.g. turret directly
+        // above/below the target on a steep ramp).
+        if (flatFireForward.sqrMagnitude < 0.001f || directionToTarget.sqrMagnitude < 0.001f)
+        {
+            return;
+        }
+
         float angleToTarget = Vector3.Angle(flatFireForward, directionToTarget);
 
         if (angleToTarget <= maximumFireAngle && HasLineOfSight())
         {
             vehicleWeapon.TryFire();
+        }
+    }
+
+    /// <summary>
+    /// Handles Kamikaze ram damage on physical collision.
+    /// Only applies damage when this vehicle is in the Attack state and is
+    /// configured as a Kamikaze, preventing accidental damage during pursuit
+    /// or recovery phases.
+    /// </summary>
+    private void OnCollisionEnter(Collision collision)
+    {
+        // DIAGNOSTIC: Log every collision so we can confirm physics events are firing.
+        Debug.Log($"💥 [KAMIKAZE] Collision detected with: {collision.gameObject.name}");
+
+        // Only the Kamikaze type deals ram damage.
+        if (enemyType != EnemyType.Kamikaze) return;
+
+        // Only deal damage during the attack charge, not during pursuit or recovery.
+        if (currentState != VehicleAIState.Attack) return;
+
+        // Self-damage guard: skip any collider that belongs to this vehicle's own
+        // hierarchy.  Comparing transform.root handles multi-collider rigs where the
+        // contact point may be a child collider rather than the root itself.
+        if (collision.transform.root == transform.root) return;
+
+        // Walk up the collision hierarchy to find the IDamageable implementation on
+        // the root GameObject (HealthComponent).  This ensures the hit registers
+        // correctly on vehicles that distribute physics across multiple child
+        // colliders (wheels, body panels, etc.).
+        IDamageable target = collision.gameObject.GetComponentInParent<IDamageable>();
+        if (target != null)
+        {
+            Debug.Log($"🩸 [KAMIKAZE] Applying damage to: {target}");
+            target.TakeDamage(ramDamage);
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ [KAMIKAZE] Collision detected but no IDamageable found in parent.");
         }
     }
 
