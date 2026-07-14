@@ -87,5 +87,25 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1826610566561443437, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -7328439815932020368}
   m_SourcePrefab: {fileID: 100100000, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
+--- !u!1 &36702325085817975 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1826610566561443437, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
+  m_PrefabInstance: {fileID: 1863091873434133018}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &-7328439815932020368
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 36702325085817975}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b2aa3eff286c55048aded48bf0efc104, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ActiveEffectsHandler

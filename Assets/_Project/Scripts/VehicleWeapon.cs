@@ -71,6 +71,35 @@ public sealed class VehicleWeapon : MonoBehaviour
     private Transform _aiTarget;
 
     // -------------------------------------------------------------------------
+    // Power-Up Multipliers
+    // Written by a future PowerUpHandler; read at fire time / on get from pool.
+    // Clamped to 0.1f so the weapon can never reach zero output.
+    // -------------------------------------------------------------------------
+
+    private float _damageMultiplier  = 1f;
+    private float _fireRateMultiplier = 1f;
+
+    /// <summary>
+    /// Scales the projectile's base damage.  Values &gt; 1 increase damage;
+    /// values &lt; 1 decrease it.  Minimum enforced: 0.1.  Default: 1.
+    /// </summary>
+    public float DamageMultiplier
+    {
+        get => _damageMultiplier;
+        set => _damageMultiplier = Mathf.Max(0.1f, value);
+    }
+
+    /// <summary>
+    /// Scales the effective fire cooldown.
+    /// 0.5 = half the cooldown = twice the fire rate.  Minimum enforced: 0.1.  Default: 1.
+    /// </summary>
+    public float FireRateMultiplier
+    {
+        get => _fireRateMultiplier;
+        set => _fireRateMultiplier = Mathf.Max(0.1f, value);
+    }
+
+    // -------------------------------------------------------------------------
     // Public API
     // -------------------------------------------------------------------------
 
@@ -150,7 +179,8 @@ public sealed class VehicleWeapon : MonoBehaviour
     public void TryFire()
     {
         if (_isReloading) return;
-        if (Time.time < _lastFireTime + fireRate) return;
+        // FireRateMultiplier shrinks the cooldown window: 0.5 = 2× fire rate.
+        if (Time.time < _lastFireTime + fireRate * FireRateMultiplier) return;
 
         if (_currentAmmo <= 0)
         {
@@ -231,13 +261,17 @@ public sealed class VehicleWeapon : MonoBehaviour
         //    will fly ballistically).
         projectile.SetTarget(_aiTarget);
 
+        // 4. Forward the current damage multiplier so each round carries the
+        //    weapon's power-up state at the moment it is fired.
+        projectile.SetDamageMultiplier(DamageMultiplier);
+
         // DIAGNOSTIC: Confirm whether a homing target was passed to this round.
         if (_aiTarget != null)
         {
             Debug.Log($"🎯 [WEAPON] Target assigned to projectile: {_aiTarget.name}");
         }
 
-        // 4. Reset per-activation state and enable the GameObject.
+        // 5. Reset per-activation state and enable the GameObject.
         projectile.OnGetFromPool();
     }
 

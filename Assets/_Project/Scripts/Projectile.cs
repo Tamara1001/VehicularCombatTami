@@ -90,6 +90,14 @@ public sealed class Projectile : MonoBehaviour
     /// </summary>
     private Transform _homingTarget;
 
+    /// <summary>
+    /// Runtime damage multiplier forwarded by <see cref="VehicleWeapon"/> each time
+    /// this projectile is retrieved from the pool.  The base <see cref="damage"/> field
+    /// (set in the Inspector) is multiplied by this value on impact.
+    /// Reset to 1 on pool return so stale power-up states never carry over.
+    /// </summary>
+    private float _damageMultiplier = 1f;
+
     // -------------------------------------------------------------------------
     // Unity messages
     // -------------------------------------------------------------------------
@@ -151,6 +159,7 @@ public sealed class Projectile : MonoBehaviour
     {
         ClearTarget();
         ClearOwner();
+        _damageMultiplier = 1f;   // Reset so the next user starts from the base value.
         gameObject.SetActive(false);
     }
 
@@ -176,6 +185,21 @@ public sealed class Projectile : MonoBehaviour
     public void ClearOwner()
     {
         _ownerRoot = null;
+    }
+
+    // -------------------------------------------------------------------------
+    // Damage Multiplier API  (called by VehicleWeapon before activation)
+    // -------------------------------------------------------------------------
+
+    /// <summary>
+    /// Sets the runtime damage scale applied on top of the base <see cref="damage"/>.
+    /// Called by <see cref="VehicleWeapon.OnGetProjectile"/> immediately before
+    /// the projectile is activated.  The value is reset to 1 on pool return.
+    /// </summary>
+    /// <param name="multiplier">Damage scale factor. Clamped to a minimum of 0.1.</param>
+    public void SetDamageMultiplier(float multiplier)
+    {
+        _damageMultiplier = Mathf.Max(0.1f, multiplier);
     }
 
     // -------------------------------------------------------------------------
@@ -317,8 +341,9 @@ public sealed class Projectile : MonoBehaviour
         // ── STEP 5: Apply damage or emit a full root-component diagnostic ─────
         if (target != null)
         {
-            Debug.Log($"🩸 [PROJECTILE] Successfully dealt {damage} damage to: {target}");
-            target.TakeDamage(damage);
+            int scaledDamage = Mathf.RoundToInt(damage * _damageMultiplier);
+            Debug.Log($"🩸 [PROJECTILE] Successfully dealt {scaledDamage} damage (base {damage} × {_damageMultiplier:F2}) to: {target}");
+            target.TakeDamage(scaledDamage);
         }
         else
         {

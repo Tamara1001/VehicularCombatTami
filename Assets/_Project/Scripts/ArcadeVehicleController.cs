@@ -47,6 +47,38 @@ public sealed class ArcadeVehicleController : MonoBehaviour
     private bool _isLunarGravity = true;
     private float _currentGravity;
 
+    // -------------------------------------------------------------------------
+    // Power-Up Multipliers
+    // These are written by a future PowerUpHandler and read each physics tick.
+    // They stack cleanly on top of Nitro and all existing movement math.
+    // Clamped to 0.1f so the vehicle can never have zero or negative core stats.
+    // -------------------------------------------------------------------------
+
+    private float _speedMultiplier       = 1f;
+    private float _accelerationMultiplier = 1f;
+    private float _turnSpeedMultiplier   = 1f;
+
+    /// <summary>Scales <c>maximumForwardSpeed</c> (and the Nitro boosted cap). Default: 1.</summary>
+    public float SpeedMultiplier
+    {
+        get => _speedMultiplier;
+        set => _speedMultiplier = Mathf.Max(0.1f, value);
+    }
+
+    /// <summary>Scales the base <c>acceleration</c> force (and the Nitro boosted force). Default: 1.</summary>
+    public float AccelerationMultiplier
+    {
+        get => _accelerationMultiplier;
+        set => _accelerationMultiplier = Mathf.Max(0.1f, value);
+    }
+
+    /// <summary>Scales <c>turnSpeed</c> degrees-per-second. Default: 1.</summary>
+    public float TurnSpeedMultiplier
+    {
+        get => _turnSpeedMultiplier;
+        set => _turnSpeedMultiplier = Mathf.Max(0.1f, value);
+    }
+
     private void Awake()
     {
         _rigidbody = GetComponent<Rigidbody>();
@@ -141,10 +173,13 @@ public sealed class ArcadeVehicleController : MonoBehaviour
     // --- FÍSICAS MODIFICADAS ---
     private void ApplyAcceleration(bool isBoosting)
     {
-        float currentAccel = isBoosting ? acceleration * nitroAccelMultiplier : acceleration;
-        float currentMaxSpeed = isBoosting ? maximumForwardSpeed * nitroSpeedMultiplier : maximumForwardSpeed;
+        // Apply power-up multipliers first, then layer Nitro on top.
+        float currentAccel    = (isBoosting ? acceleration * nitroAccelMultiplier : acceleration)
+                                * AccelerationMultiplier;
+        float currentMaxSpeed = (isBoosting ? maximumForwardSpeed * nitroSpeedMultiplier : maximumForwardSpeed)
+                                * SpeedMultiplier;
 
-        float forwardSpeed = Vector3.Dot(_rigidbody.linearVelocity, transform.forward);
+        float forwardSpeed  = Vector3.Dot(_rigidbody.linearVelocity, transform.forward);
         float verticalInput = _movementInput.y;
 
         if (verticalInput > 0f && forwardSpeed >= currentMaxSpeed) return;
@@ -156,9 +191,10 @@ public sealed class ArcadeVehicleController : MonoBehaviour
 
     private void ApplyTurning()
     {
-        float forwardSpeed = Vector3.Dot(_rigidbody.linearVelocity, transform.forward);
-        float speedFactor = Mathf.Clamp01(Mathf.Abs(forwardSpeed) / maximumForwardSpeed);
-        float rotationAmount = _movementInput.x * turnSpeed * speedFactor * Time.fixedDeltaTime;
+        float forwardSpeed   = Vector3.Dot(_rigidbody.linearVelocity, transform.forward);
+        float speedFactor    = Mathf.Clamp01(Mathf.Abs(forwardSpeed) / maximumForwardSpeed);
+        // TurnSpeedMultiplier scales the effective turn speed for power-up effects.
+        float rotationAmount = _movementInput.x * (turnSpeed * TurnSpeedMultiplier) * speedFactor * Time.fixedDeltaTime;
 
         Quaternion rotation = Quaternion.Euler(0f, rotationAmount, 0f);
         _rigidbody.MoveRotation(_rigidbody.rotation * rotation);

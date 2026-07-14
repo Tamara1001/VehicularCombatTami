@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fa01072b9869d74095c49b877164537, type: 3}
+  m_Name: SPD_Boost
+  m_EditorClassIdentifier: Assembly-CSharp::StatMultiplierEffect
+  effectName: Speed_Increased
+  effectIcon: {fileID: 0}
+  statType: 0
+  multiplierValue: 1.5

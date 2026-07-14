@@ -85,6 +85,15 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1826610566561443437, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8060912520615800825}
+    - targetCorrespondingSourceObject: {fileID: 1826610566561443437, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8082976929027180322}
+    - targetCorrespondingSourceObject: {fileID: 1826610566561443437, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6568344455079672608}
+    - targetCorrespondingSourceObject: {fileID: 1826610566561443437, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2581438296408568315}
   m_SourcePrefab: {fileID: 100100000, guid: 37f04a81ed50f6f4cb979730dba6537f, type: 3}
 --- !u!1 &5582649372705424709 stripped
 GameObject:
@@ -173,3 +182,61 @@ MonoBehaviour:
   environmentLayerMask:
     serializedVersion: 2
     m_Bits: 256
+--- !u!114 &8082976929027180322
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5582649372705424709}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 020fe0fc4f8615947b641e6a1ccf5039, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VehicleResourceComponent
+  _maxBoost: 100
+  _boostRegenPerSecond: 10
+  _regenDelay: 0.5
+--- !u!114 &6568344455079672608
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5582649372705424709}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb646176e09e05a4fa694f1eccabf1d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ArcadeVehicleController
+  acceleration: 35
+  maximumForwardSpeed: 18
+  maximumReverseSpeed: 8
+  turnSpeed: 120
+  lateralFriction: 8
+  brakeForce: 18
+  nitroSpeedMultiplier: 1.6
+  nitroAccelMultiplier: 2
+  nitroCostPerSecond: 35
+  jumpForce: 15
+  lunarGravity: -1.62
+  earthGravity: -9.81
+  earthGravityCostPerSecond: 10
+  stabilizationSpeed: 5
+  groundCheck: {fileID: 0}
+  groundRadius: 0.3
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 0
+--- !u!114 &2581438296408568315
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5582649372705424709}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b2aa3eff286c55048aded48bf0efc104, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ActiveEffectsHandler

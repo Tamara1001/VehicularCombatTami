@@ -137,6 +137,34 @@ public class HealthComponent : MonoBehaviour, IDamageable
     }
 
     // ----------------------------------------------------------
+    // HEAL
+    // ----------------------------------------------------------
+
+    /// <summary>
+    /// Restores health to this entity, clamped to <see cref="maxHealth"/>.
+    /// Fires <see cref="OnHealthChanged"/> so UI and other listeners update
+    /// exactly as they do after damage.
+    ///
+    /// Dead entities cannot be healed — the <see cref="isDead"/> guard
+    /// prevents a heal power-up from reviving a destroyed vehicle.
+    /// </summary>
+    /// <param name="amount">Positive integer HP to restore. Non-positive values are ignored.</param>
+    public void Heal(int amount)
+    {
+        // Guard: cannot heal a dead entity.
+        if (isDead) return;
+
+        // Ignore zero / negative heal calls (defensive programming).
+        if (amount <= 0) return;
+
+        currentHealth += amount;
+        currentHealth  = Mathf.Clamp(currentHealth, 0, maxHealth);
+
+        // Notify all listeners (e.g., health-bar UI) identically to TakeDamage.
+        OnHealthChanged?.Invoke(GetNormalizedHealth());
+    }
+
+    // ----------------------------------------------------------
     // PUBLIC READ-ONLY ACCESSORS
     // Expose read-only state without breaking encapsulation.
     // No public setters exist — only TakeDamage() mutates state.
