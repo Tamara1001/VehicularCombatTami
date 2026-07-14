@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6af00d6c2c02e13439b9450def98a410, type: 3}
-  m_Name: HP_Boost
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InstantHealEffect
   effectName: InstantHeal_Med
   effectIcon: {fileID: 0}
