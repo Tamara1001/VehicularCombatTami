@@ -126,7 +126,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18a5711b8aa4720408f3dc0cbc2d2c00, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HealthComponent
-  maxHealth: 100
+  maxHealth: 30
 --- !u!135 &4640967301970202496
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -162,6 +162,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CombatVehicleAI
   enemyType: 0
   kamikazeChargeThrottle: 1.5
+  ramDamage: 20
   vehicleController: {fileID: 2408058298049813889}
   vehicleWeapon: {fileID: 2310848364422163787}
   target: {fileID: 0}
@@ -252,6 +253,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyTurretAim
   rotationSpeed: 120
+  projectileSpeed: 18
 --- !u!1 &6035300313583540270
 GameObject:
   m_ObjectHideFlags: 0

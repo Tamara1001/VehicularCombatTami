@@ -12,16 +12,16 @@
 //   Only ONE instance should exist per scene.
 //
 // ARCHITECTURE:
-//   - Subscribes to EnemyVehicleBase.OnEnemyDied for each enemy
-//     alive in the scene when Playing state begins.
+//   - Subscribes to OnEnemyDied for BOTH EnemyVehicleBase (Kamikaze)
+//     AND CombatVehicleAI (Shooter) instances alive when Playing begins.
 //   - Listens to GameManager.OnStateChanged to:
 //       a) Reset + re-discover enemies on a new game (Playing state).
 //       b) Silence all listeners on GameOver (player died first).
-//   - Uses a Dictionary<EnemyVehicleBase, Action> to store a named
-//     delegate per enemy, enabling clean per-enemy unsubscription
+//   - Uses two parallel Dictionary<T, Action> tables — one per enemy
+//     type — storing named delegates for clean per-enemy unsubscription
 //     (avoids anonymous-lambda memory leaks).
-//   - For runtime-spawned enemies, call RegisterEnemy() from your
-//     WaveManager or spawn pool after instantiation.
+//   - For runtime-spawned enemies, call the appropriate RegisterEnemy()
+//     overload from your WaveManager or spawn pool after instantiation.
 //
 // REQUIREMENTS:
 //   - EnemyVehicleBase must be in the scene (or registered via
@@ -62,6 +62,13 @@ public class WinConditionManager : MonoBehaviour
     /// </summary>
     private readonly Dictionary<EnemyVehicleBase, Action> _enemyHandlers
         = new Dictionary<EnemyVehicleBase, Action>();
+
+    /// <summary>
+    /// Maps each <see cref="CombatVehicleAI"/> Shooter enemy to its
+    /// stored delegate, mirroring the pattern used by _enemyHandlers.
+    /// </summary>
+    private readonly Dictionary<CombatVehicleAI, Action> _combatAIHandlers
+        = new Dictionary<CombatVehicleAI, Action>();
 
     /// <summary>
     /// Set to true once win/loss is resolved so no further kills pass through
@@ -134,26 +141,41 @@ public class WinConditionManager : MonoBehaviour
         _killCount    = 0;
         _sessionEnded = false;
         _enemyHandlers.Clear();
+        _combatAIHandlers.Clear();
 
         Debug.Log($"[WinConditionManager] Session reset. Goal: {killsRequired} kills.", this);
     }
 
     /// <summary>
     /// Scene-wide enemy discovery. Finds all <see cref="EnemyVehicleBase"/>
-    /// instances present at the moment Playing begins and registers them.
+    /// (Kamikaze) AND <see cref="CombatVehicleAI"/> (Shooter) instances
+    /// present at the moment Playing begins and registers them.
     /// Uses <c>FindObjectsByType</c> (Unity 2023.1+ API).
     /// </summary>
     private void DiscoverAndRegisterEnemies()
     {
-        EnemyVehicleBase[] enemies =
+        // --- Kamikaze enemies (EnemyVehicleBase subclasses) ---
+        EnemyVehicleBase[] baseEnemies =
             FindObjectsByType<EnemyVehicleBase>(FindObjectsSortMode.None);
 
-        foreach (EnemyVehicleBase enemy in enemies)
+        foreach (EnemyVehicleBase enemy in baseEnemies)
         {
             RegisterEnemy(enemy);
         }
 
-        Debug.Log($"[WinConditionManager] Registered {_enemyHandlers.Count} enemies in scene.", this);
+        // --- Shooter enemies (CombatVehicleAI — does not inherit EnemyVehicleBase) ---
+        CombatVehicleAI[] shooters =
+            FindObjectsByType<CombatVehicleAI>(FindObjectsSortMode.None);
+
+        foreach (CombatVehicleAI shooter in shooters)
+        {
+            RegisterEnemy(shooter);
+        }
+
+        int total = _enemyHandlers.Count + _combatAIHandlers.Count;
+        Debug.Log($"[WinConditionManager] Registered {total} enemies in scene "
+                + $"({_enemyHandlers.Count} EnemyVehicleBase, "
+                + $"{_combatAIHandlers.Count} CombatVehicleAI).", this);
     }
 
     // ----------------------------------------------------------
@@ -161,7 +183,7 @@ public class WinConditionManager : MonoBehaviour
     // ----------------------------------------------------------
 
     /// <summary>
-    /// Registers a single enemy with the win-condition tracker.
+    /// Registers a Kamikaze (<see cref="EnemyVehicleBase"/>) enemy.
     /// Call this from a WaveManager or spawn system every time a new
     /// enemy is instantiated at runtime after the scene loads.
     /// </summary>
@@ -170,7 +192,7 @@ public class WinConditionManager : MonoBehaviour
     {
         if (enemy == null)
         {
-            Debug.LogWarning("[WinConditionManager] RegisterEnemy called with a null reference.", this);
+            Debug.LogWarning("[WinConditionManager] RegisterEnemy(EnemyVehicleBase) called with a null reference.", this);
             return;
         }
 
@@ -182,15 +204,56 @@ public class WinConditionManager : MonoBehaviour
         enemy.OnEnemyDied    += handler;
     }
 
+    /// <summary>
+    /// Registers a Shooter (<see cref="CombatVehicleAI"/>) enemy.
+    /// Mirrors <see cref="RegisterEnemy(EnemyVehicleBase)"/> exactly;
+    /// routes death notification through <see cref="OnCombatAIKilled"/>.
+    /// Call this from a WaveManager whenever a Shooter is spawned at runtime.
+    /// </summary>
+    /// <param name="enemy">The <see cref="CombatVehicleAI"/> to track. Null-safe.</param>
+    public void RegisterEnemy(CombatVehicleAI enemy)
+    {
+        if (enemy == null)
+        {
+            Debug.LogWarning("[WinConditionManager] RegisterEnemy(CombatVehicleAI) called with a null reference.", this);
+            return;
+        }
+
+        if (_combatAIHandlers.ContainsKey(enemy)) return; // Prevent duplicate subscriptions.
+
+        Action handler = () => OnCombatAIKilled(enemy);
+        _combatAIHandlers[enemy] = handler;
+        enemy.OnEnemyDied       += handler;
+    }
+
     // ----------------------------------------------------------
-    // ENEMY DEATH HANDLER
+    // ENEMY DEATH HANDLERS
     // ----------------------------------------------------------
 
     /// <summary>
-    /// Invoked when a registered enemy dies.
+    /// Invoked when a registered <see cref="EnemyVehicleBase"/> (Kamikaze) dies.
     /// Increments the kill counter and checks the win condition.
     /// </summary>
     private void OnEnemyKilled(EnemyVehicleBase enemy)
+    {
+        RegisterKill(enemy != null ? enemy.name : "Unknown EnemyVehicleBase");
+    }
+
+    /// <summary>
+    /// Invoked when a registered <see cref="CombatVehicleAI"/> (Shooter) dies.
+    /// Increments the kill counter and checks the win condition.
+    /// </summary>
+    private void OnCombatAIKilled(CombatVehicleAI enemy)
+    {
+        RegisterKill(enemy != null ? enemy.name : "Unknown CombatVehicleAI");
+    }
+
+    /// <summary>
+    /// Shared kill-registration logic called by both death handlers.
+    /// Keeps the increment + guard logic in a single place (DRY).
+    /// </summary>
+    /// <param name="enemyName">Display name used for the Debug.Log.</param>
+    private void RegisterKill(string enemyName)
     {
         // Guard: session already resolved (GameOver or Victory).
         if (_sessionEnded) return;
@@ -203,7 +266,7 @@ public class WinConditionManager : MonoBehaviour
         }
 
         _killCount++;
-        Debug.Log($"[WinConditionManager] Kill confirmed: '{enemy.name}'. " +
+        Debug.Log($"[WinConditionManager] Kill confirmed: '{enemyName}'. " +
                   $"Progress: {_killCount}/{killsRequired}.", this);
 
         CheckWinCondition();
@@ -229,11 +292,13 @@ public class WinConditionManager : MonoBehaviour
     // ----------------------------------------------------------
 
     /// <summary>
-    /// Unsubscribes from every tracked enemy using the stored delegates,
-    /// then clears the dictionary. Prevents dangling event references.
+    /// Unsubscribes from every tracked enemy (both types) using the stored
+    /// delegates, then clears both dictionaries.
+    /// Prevents dangling event references on scene reload or game end.
     /// </summary>
     private void UnsubscribeAllEnemies()
     {
+        // --- EnemyVehicleBase (Kamikaze) ---
         foreach (var kvp in _enemyHandlers)
         {
             if (kvp.Key != null)
@@ -241,7 +306,16 @@ public class WinConditionManager : MonoBehaviour
                 kvp.Key.OnEnemyDied -= kvp.Value;
             }
         }
-
         _enemyHandlers.Clear();
+
+        // --- CombatVehicleAI (Shooter) ---
+        foreach (var kvp in _combatAIHandlers)
+        {
+            if (kvp.Key != null)
+            {
+                kvp.Key.OnEnemyDied -= kvp.Value;
+            }
+        }
+        _combatAIHandlers.Clear();
     }
 }

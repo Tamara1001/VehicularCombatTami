@@ -919,18 +919,26 @@ public abstract class EnemyVehicleBase : MonoBehaviour
     }
 
     /// <summary>
-    /// Invoked by HealthComponent.OnDied. Fires the public
-    /// OnEnemyDied event so listeners (GameManager, VFX spawner,
-    /// etc.) can react. This class does NOT destroy itself.
+    /// Invoked by HealthComponent.OnDied.
+    /// Order of operations:
+    ///   1. Freeze the Rigidbody so the corpse doesn't slide away.
+    ///   2. Fire OnEnemyDied so WinConditionManager (and any VFX/audio
+    ///      listeners) can react synchronously before the object is gone.
+    ///   3. Destroy the GameObject — this also triggers OnDestroy, which
+    ///      cleanly unsubscribes from HealthComponent.OnDied.
     /// </summary>
     private void OnHealthDepleted()
     {
-        // Disable FSM and physics so the dead vehicle doesn't keep moving.
-        CurrentState = EnemyState.Stunned; // Bypass TransitionTo to avoid event noise.
+        // 1. Kill physics immediately.
         Rb.linearVelocity = Vector3.zero;
-        enabled = false;
+        Rb.angularVelocity = Vector3.zero;
 
+        // 2. Notify all external listeners (WinConditionManager, VFX, etc.).
         OnEnemyDied?.Invoke();
+
+        // 3. Remove the GameObject from the scene.
+        Debug.Log($"[{name}] Destroyed after health depleted.", this);
+        Destroy(gameObject);
     }
 
     // ----------------------------------------------------------

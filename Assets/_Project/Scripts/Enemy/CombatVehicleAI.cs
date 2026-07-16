@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 /// <summary>
@@ -128,6 +129,19 @@ public sealed class CombatVehicleAI : MonoBehaviour
     private float recoveryTimer;
     private float stuckTimer;
 
+    // ----------------------------------------------------------
+    // HEALTH / DEATH
+    // ----------------------------------------------------------
+
+    /// <summary>
+    /// Fired when this vehicle's health reaches zero.
+    /// WinConditionManager and any VFX/audio listeners subscribe here.
+    /// </summary>
+    public event Action OnEnemyDied;
+
+    /// <summary>Reference to the HealthComponent on this GameObject.</summary>
+    private HealthComponent _health;
+
     private void Awake()
     {
         if (vehicleController == null)
@@ -141,6 +155,19 @@ public sealed class CombatVehicleAI : MonoBehaviour
         if (sensorOrigin == null)
         {
             sensorOrigin = transform.Find("SensorOrigin");
+        }
+
+        // Subscribe to the health system so this AI responds to death
+        // through the same pipeline as EnemyVehicleBase.
+        _health = GetComponent<HealthComponent>();
+        if (_health != null)
+        {
+            _health.OnDied += OnHealthDepleted;
+        }
+        else
+        {
+            Debug.LogError($"[{name}] CombatVehicleAI requires a HealthComponent. "
+                         + "Add one to this GameObject.", this);
         }
     }
 
@@ -495,11 +522,11 @@ public sealed class CombatVehicleAI : MonoBehaviour
 
         if (newState == VehicleAIState.Reposition)
         {
-            orbitDirection = Random.value < 0.5f ? -1f : 1f;
+            orbitDirection = UnityEngine.Random.value < 0.5f ? -1f : 1f;
         }
         if (newState == VehicleAIState.Recover)
         {
-            recoveryDirection = Random.value < 0.5f ? -1f : 1f;
+            recoveryDirection = UnityEngine.Random.value < 0.5f ? -1f : 1f;
             recoveryTimer = recoveryDuration;
         }
     }
@@ -514,6 +541,42 @@ public sealed class CombatVehicleAI : MonoBehaviour
         if (vehicleController != null)
         {
             vehicleController.SetAIInput(0f, 0f, true);
+        }
+    }
+
+    // ----------------------------------------------------------
+    // DEATH HANDLER
+    // ----------------------------------------------------------
+
+    /// <summary>
+    /// Invoked by HealthComponent.OnDied.
+    /// Order of operations mirrors EnemyVehicleBase.OnHealthDepleted:
+    ///   1. Stop all vehicle movement immediately.
+    ///   2. Notify external listeners (WinConditionManager, VFX, etc.)
+    ///      while the GameObject still exists.
+    ///   3. Destroy the GameObject — Unity will call OnDestroy, which
+    ///      cleanly unsubscribes from HealthComponent.OnDied.
+    /// </summary>
+    private void OnHealthDepleted()
+    {
+        // 1. Kill movement immediately.
+        StopVehicle();
+
+        // 2. Notify all external listeners synchronously.
+        OnEnemyDied?.Invoke();
+
+        // 3. Remove the GameObject from the arena.
+        Debug.Log($"[{name}] CombatVehicleAI destroyed after health depleted.", this);
+        Destroy(gameObject);
+    }
+
+    private void OnDestroy()
+    {
+        // Prevent dangling event subscriptions if the object is destroyed
+        // by any other means (scene reload, editor stop, etc.).
+        if (_health != null)
+        {
+            _health.OnDied -= OnHealthDepleted;
         }
     }
 
