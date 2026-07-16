@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 54750368bd068e741bb5bf4432ac0e04
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 625f186215c104763be7675aa2d941aa, type: 3}
+AssetOrigin:
+  serializedVersion: 1
+  productId: 384728
+  packageName: Desert Moon Surface
+  packageVersion: 1.0
+  assetPath: Assets/LoafbrrAssets/DesertMoonSurface/Material/ORM_Shader_Vertex v2.shadergraph
+  uploadId: 927886

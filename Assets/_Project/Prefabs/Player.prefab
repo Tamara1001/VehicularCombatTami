@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 4640967301970202496}
   - component: {fileID: 9083397836664732312}
   - component: {fileID: 1551178722284868477}
+  - component: {fileID: 6020257994495000315}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -383,6 +384,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2aa3eff286c55048aded48bf0efc104, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ActiveEffectsHandler
+--- !u!114 &6020257994495000315
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1826610566561443437}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d33cd4e11b1e1f4392742f7550fd335, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerDeathListener
 --- !u!1 &1935900369925427118
 GameObject:
   m_ObjectHideFlags: 0
@@ -688,10 +701,30 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -8178870051318802417, guid: 44d7c5c8a33bc04409aefe13cffc8412, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: b9647906ad0c6a44eb59a77a57732862, type: 2}
+    - target: {fileID: -2975571875019480725, guid: 44d7c5c8a33bc04409aefe13cffc8412, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: b9647906ad0c6a44eb59a77a57732862, type: 2}
     - target: {fileID: 919132149155446097, guid: 44d7c5c8a33bc04409aefe13cffc8412, type: 3}
       propertyPath: m_Name
       value: Rover1
       objectReference: {fileID: 0}
+    - target: {fileID: 950105491225846975, guid: 44d7c5c8a33bc04409aefe13cffc8412, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: b9647906ad0c6a44eb59a77a57732862, type: 2}
+    - target: {fileID: 2703698442655468623, guid: 44d7c5c8a33bc04409aefe13cffc8412, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: b9647906ad0c6a44eb59a77a57732862, type: 2}
+    - target: {fileID: 3567745469751828501, guid: 44d7c5c8a33bc04409aefe13cffc8412, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: b9647906ad0c6a44eb59a77a57732862, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -762,10 +795,26 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -2228337263393907408, guid: a6008e19804dc34428f6c8a390097cf8, type: 3}
+      propertyPath: 'm_Materials.Array.data[2]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 1bb5cda861aaa2948b511df8314c06b9, type: 2}
+    - target: {fileID: -2228337263393907408, guid: a6008e19804dc34428f6c8a390097cf8, type: 3}
+      propertyPath: 'm_Materials.Array.data[3]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 1bb5cda861aaa2948b511df8314c06b9, type: 2}
     - target: {fileID: 919132149155446097, guid: a6008e19804dc34428f6c8a390097cf8, type: 3}
       propertyPath: m_Name
       value: Turret_Cannon
       objectReference: {fileID: 0}
+    - target: {fileID: 4312637900489990388, guid: a6008e19804dc34428f6c8a390097cf8, type: 3}
+      propertyPath: 'm_Materials.Array.data[1]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 1bb5cda861aaa2948b511df8314c06b9, type: 2}
+    - target: {fileID: 4312637900489990388, guid: a6008e19804dc34428f6c8a390097cf8, type: 3}
+      propertyPath: 'm_Materials.Array.data[2]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 1bb5cda861aaa2948b511df8314c06b9, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

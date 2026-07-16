@@ -947,7 +947,12 @@ public abstract class EnemyVehicleBase : MonoBehaviour
         Agent.updatePosition = false;   // Rigidbody owns position.
         Agent.updateRotation = false;   // Rigidbody owns rotation.
         Agent.updateUpAxis   = false;   // Prevent agent from fighting gravity.
-        Agent.isStopped      = true;    // Agent is path-only; never moves itself.
+        // NOTE: Agent.isStopped is intentionally absent.
+        // With all three update flags disabled the agent is already a passive
+        // path-calculator — it never applies locomotion to the Transform, so
+        // isStopped is both redundant and illegal to call in Awake() (the agent
+        // is not yet placed on the NavMesh at that point, which throws:
+        // "Stop can only be called on an active agent that has been placed on a NavMesh").
     }
 
     /// <summary>

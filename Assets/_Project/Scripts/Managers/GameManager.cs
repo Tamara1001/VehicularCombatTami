@@ -81,18 +81,58 @@ public class GameManager : MonoBehaviour
     // -------------------------------------------------------------------------
     private void Awake()
     {
-        // Protección del Singleton
+        // ── STEP 1: Entry trace ──────────────────────────────────────────────
+        // Fires unconditionally — even on duplicates that are about to be
+        // destroyed. If you do NOT see this line for a particular GameObject,
+        // Unity never called Awake on it (prefab instantiation issue).
+        Debug.Log($"[GameManager] Awake called on GameObject: '{gameObject.name}' " +
+                  $"(InstanceID: {GetInstanceID()}, Scene: '{gameObject.scene.name}').");
+
+        // ── STEP 2: Singleton duplicate guard ────────────────────────────────
+        // If another instance already owns the singleton slot, this one is a
+        // duplicate (e.g. the GameManager prefab is present in two scenes, or
+        // DontDestroyOnLoad kept an old instance alive across a scene reload).
         if (Instance != null && Instance != this)
         {
+            Debug.LogError(
+                $"[GameManager] *** DUPLICATE DETECTED *** \n" +
+                $"  Destroying:        '{gameObject.name}'  (InstanceID: {GetInstanceID()})\n" +
+                $"  Keeping (existing): '{Instance.gameObject.name}'  (InstanceID: {Instance.GetInstanceID()})\n" +
+                $"  Root cause: Either the GameManager prefab exists in more than one scene, " +
+                $"or a second instance was created while DontDestroyOnLoad is already holding the first.\n" +
+                $"  Fix: Remove the duplicate from the scene hierarchy and keep only ONE GameManager.",
+                gameObject);
+
             Destroy(gameObject);
             return;
         }
 
+        // ── STEP 3: Claim the singleton slot ─────────────────────────────────
         Instance = this;
+
+        // ── STEP 4: Root-object safety ───────────────────────────────────────
+        // DontDestroyOnLoad only works on root GameObjects. If this object has
+        // a parent (e.g. it was accidentally nested in the hierarchy), Unity
+        // will silently ignore the call and destroy it on scene load anyway.
+        // SetParent(null) guarantees root status before the DDOL call.
+        if (transform.parent != null)
+        {
+            Debug.LogWarning($"[GameManager] '{gameObject.name}' had a parent " +
+                             $"('{transform.parent.name}'). Detaching to root before DontDestroyOnLoad.", this);
+            transform.SetParent(null);
+        }
+
         DontDestroyOnLoad(gameObject);
 
-        // Estado inicial explícito para evitar lecturas de valores nulos al arrancar.
+        // ── STEP 5: Initialise FSM state ─────────────────────────────────────
+        // Explicit initialisation avoids null/default-value reads before the
+        // first ChangeState() call.
         CurrentState = GameState.MainMenu;
+
+        // ── STEP 6: Success confirmation ─────────────────────────────────────
+        Debug.Log($"[GameManager] Initialisation successful. " +
+                  $"'{gameObject.name}' is now the active singleton instance " +
+                  $"and has been moved to DontDestroyOnLoad.", this);
     }
 
     private void OnEnable()

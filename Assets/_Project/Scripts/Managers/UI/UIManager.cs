@@ -44,13 +44,39 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
-        // En lugar de forzar el menú principal, leemos la realidad actual de la FSM
+        // ---------------------------------------------------------------
+        // Safety check: log any unassigned panel references immediately so
+        // missing Inspector wires are caught at startup, not mid-session.
+        // ---------------------------------------------------------------
+        if (mainMenuPanel   == null) Debug.LogWarning("[UIManager] mainMenuPanel is not assigned in the Inspector!",   this);
+        if (playingHUDPanel == null) Debug.LogWarning("[UIManager] playingHUDPanel is not assigned in the Inspector!", this);
+        if (pausePanel      == null) Debug.LogWarning("[UIManager] pausePanel is not assigned in the Inspector!",      this);
+        if (gameOverPanel   == null) Debug.LogWarning("[UIManager] gameOverPanel is not assigned in the Inspector!",   this);
+        if (victoryPanel    == null) Debug.LogWarning("[UIManager] victoryPanel is not assigned in the Inspector!",    this);
+
+        // ---------------------------------------------------------------
+        // Bootstrap: read the FSM's current state and apply it immediately.
+        //
+        // IMPORTANT TIMING NOTE:
+        //   On a scene reload via StartNewGame(), this Start() executes
+        //   BEFORE GameManager.OnSceneLoaded() fires ChangeState(Playing).
+        //   That means at this exact moment CurrentState is still MainMenu,
+        //   so the main menu panel will be shown here — and then immediately
+        //   replaced when the Playing event arrives via OnStateChanged.
+        //   If the Playing event never arrives after this log line, the
+        //   problem is upstream in GameManager.OnSceneLoaded / _pendingRestart.
+        // ---------------------------------------------------------------
         if (GameManager.Instance != null)
         {
+            Debug.Log($"[UIManager] Start() — GameManager found. " +
+                      $"Bootstrapping UI to current state: '{GameManager.Instance.CurrentState}'. " +
+                      $"(If this is MainMenu right before Playing, that is expected — watch for the next HandleStateChanged log.)", this);
             HandleStateChanged(GameManager.Instance.CurrentState);
         }
         else
         {
+            Debug.LogWarning("[UIManager] Start() — GameManager.Instance is null! " +
+                             "Defaulting to ShowMainMenu(). Ensure GameManager exists in the scene.", this);
             ShowMainMenu();
         }
     }
@@ -60,7 +86,18 @@ public class UIManager : MonoBehaviour
     // -------------------------------------------------------------------------
     private void HandleStateChanged(GameManager.GameState newState)
     {
-        // Limpieza: Cerramos pantallas superpuestas (como opciones) ante cualquier cambio de estado
+        // ---------------------------------------------------------------
+        // DIAGNOSTIC LOG — visible in the Console for every state change.
+        // If you never see "→ Playing" here after clicking Play, the event
+        // is not reaching UIManager: check GameManager.OnSceneLoaded() and
+        // confirm _pendingRestart was set before LoadScene was called.
+        // If you see it but the panel is still wrong, a panel reference is
+        // null — check the warnings logged by Start() above.
+        // ---------------------------------------------------------------
+        Debug.Log($"[UIManager] HandleStateChanged → '{newState}'. " +
+                  $"Frame: {Time.frameCount}  |  Time: {Time.realtimeSinceStartup:F2}s", this);
+
+        // Close any overlay (e.g. Options) on every state transition.
         CloseOptionsPanel();
 
         switch (newState)
@@ -81,7 +118,8 @@ public class UIManager : MonoBehaviour
                 ShowVictory();
                 break;
             default:
-                Debug.LogWarning($"[UIManager] GameState no contemplado: {newState}");
+                Debug.LogWarning($"[UIManager] Estado no contemplado recibido: '{newState}'. " +
+                                 "Agrega un case para este estado en HandleStateChanged.", this);
                 break;
         }
     }

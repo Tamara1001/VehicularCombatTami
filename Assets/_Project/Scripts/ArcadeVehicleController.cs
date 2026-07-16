@@ -81,10 +81,36 @@ public sealed class ArcadeVehicleController : MonoBehaviour
 
     private void Awake()
     {
-        _rigidbody = GetComponent<Rigidbody>();
+        _rigidbody         = GetComponent<Rigidbody>();
         _resourceComponent = GetComponent<VehicleResourceComponent>();
         _rigidbody.useGravity = false;
-        _currentGravity = lunarGravity;
+        _currentGravity    = lunarGravity;
+
+        // -------------------------------------------------------
+        // Auto-discovery: if groundCheck was not assigned in the
+        // Inspector (or the prefab link broke at runtime), search
+        // the vehicle's own hierarchy for a child named "GroundCheck".
+        // This makes the component resilient to missing assignments
+        // without requiring the designer to re-wire the prefab.
+        // -------------------------------------------------------
+        if (groundCheck == null)
+        {
+            groundCheck = transform.Find("GroundCheck");
+
+            if (groundCheck != null)
+            {
+                Debug.Log("[ArcadeVehicleController] groundCheck was unassigned — " +
+                          $"auto-discovered '{groundCheck.name}' in the hierarchy.", this);
+            }
+            else
+            {
+                // Single warning only: FixedUpdate will not throw because
+                // ApplyStabilization() guards every access to groundCheck.
+                Debug.LogWarning("[ArcadeVehicleController] groundCheck is null and could not be " +
+                                 "found as a child named 'GroundCheck'. Ground detection will be " +
+                                 "skipped. Add a 'GroundCheck' child Transform to the vehicle prefab.", this);
+            }
+        }
     }
 
     private void FixedUpdate()
@@ -221,10 +247,22 @@ public sealed class ArcadeVehicleController : MonoBehaviour
     {
         Vector3 targetUp = Vector3.up;
 
-        if (IsGrounded() && Physics.Raycast(groundCheck.position, -transform.up, out RaycastHit hit, groundRadius + 0.5f, groundLayer))
+        // Guard: only run the slope-normal raycast when groundCheck exists AND
+        // the vehicle is confirmed grounded. Separating these two conditions
+        // prevents the NullReferenceException that occurred because IsGrounded()
+        // returns 'true' when groundCheck is null (safe fallback), which caused
+        // the right-hand side of the original '&&' to evaluate groundCheck.position
+        // even with a null reference — crashing FixedUpdate 50+ times per second.
+        if (groundCheck != null && IsGrounded())
         {
-            targetUp = hit.normal;
+            if (Physics.Raycast(groundCheck.position, -transform.up,
+                                out RaycastHit hit, groundRadius + 0.5f, groundLayer))
+            {
+                targetUp = hit.normal;
+            }
         }
+        // else: groundCheck is missing → keep targetUp = Vector3.up so the
+        // vehicle still self-levels in the air without any raycast dependency.
 
         Vector3 projectedForward = Vector3.ProjectOnPlane(transform.forward, targetUp).normalized;
 
