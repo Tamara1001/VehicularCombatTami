@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WwiseDocument Type="WorkUnit" ID="{034AD1E5-EEBA-401B-A5B0-E0710B04FAF3}" SchemaVersion="133">
+	<Containers>
+		<WorkUnit Name="Default Work Unit" ID="{034AD1E5-EEBA-401B-A5B0-E0710B04FAF3}" PersistMode="Standalone">
+			<ChildrenList>
+				<Sound Name="Hidoina" ID="{916714A7-569F-4A63-82F3-C8BB38E38F6E}" ShortID="788946049">
+					<PropertyList>
+						<Property Name="IsLoopingEnabled" Type="bool" Value="True"/>
+						<Property Name="Pitch" Type="int32">
+							<ValueList>
+								<Value>680</Value>
+							</ValueList>
+						</Property>
+						<Property Name="Volume" Type="Real64">
+							<ValueList>
+								<Value>7</Value>
+							</ValueList>
+						</Property>
+					</PropertyList>
+					<ReferenceList>
+						<Reference Name="Conversion">
+							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{BD85A285-93BF-4FCB-92C0-AA1DEFCD1577}"/>
+						</Reference>
+						<Reference Name="OutputBus">
+							<ObjectRef Name="Main Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{1BE33615-E9DB-4B51-B373-C9F45EEA4B44}"/>
+						</Reference>
+					</ReferenceList>
+					<ChildrenList>
+						<AudioFileSource Name="Hidoina" ID="{065A2C7C-752D-4174-8F45-D900122360CB}">
+							<PropertyList>
+								<Property Name="FadeInDuration" Type="Real64" Value="0.17182"/>
+								<Property Name="FadeOutDuration" Type="Real64" Value="0.34345"/>
+								<Property Name="OverrideWavLoop" Type="bool" Value="True"/>
+							</PropertyList>
+							<Language>SFX</Language>
+							<AudioFile>Hidoina.wav</AudioFile>
+							<MediaIDList>
+								<MediaID ID="903915283"/>
+							</MediaIDList>
+						</AudioFileSource>
+					</ChildrenList>
+					<ActiveSourceList>
+						<ActiveSource Name="Hidoina" ID="{065A2C7C-752D-4174-8F45-D900122360CB}" Platform="Linked"/>
+					</ActiveSourceList>
+				</Sound>
+				<Sound Name="HyperEpicSuperSpacialMusic" ID="{6109EAC9-B3ED-495C-8684-444C5F708FC1}" ShortID="560398783">
+					<PropertyList>
+						<Property Name="Volume" Type="Real64">
+							<ValueList>
+								<Value>1</Value>
+							</ValueList>
+						</Property>
+					</PropertyList>
+					<ReferenceList>
+						<Reference Name="Conversion">
+							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{BD85A285-93BF-4FCB-92C0-AA1DEFCD1577}"/>
+						</Reference>
+						<Reference Name="OutputBus">
+							<ObjectRef Name="Main Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{1BE33615-E9DB-4B51-B373-C9F45EEA4B44}"/>
+						</Reference>
+					</ReferenceList>
+					<ChildrenList>
+						<AudioFileSource Name="Theme_MainMenu (1)" ID="{716FA185-8477-4E6C-9413-494B8298BBBE}">
+							<Language>SFX</Language>
+							<AudioFile>Theme_MainMenu (1).wav</AudioFile>
+							<MediaIDList>
+								<MediaID ID="858651576"/>
+							</MediaIDList>
+						</AudioFileSource>
+					</ChildrenList>
+					<ActiveSourceList>
+						<ActiveSource Name="Theme_MainMenu (1)" ID="{716FA185-8477-4E6C-9413-494B8298BBBE}" Platform="Linked"/>
+					</ActiveSourceList>
+				</Sound>
+				<Sound Name="Disparo_J" ID="{8751E6B5-DCF4-46FE-9ADE-67218FD1873B}" ShortID="481648861">
+					<PropertyList>
+						<Property Name="Lowpass" Type="int16">
+							<ValueList>
+								<Value>27</Value>
+							</ValueList>
+						</Property>
+						<Property Name="Pitch" Type="int32">
+							<ValueList>
+								<Value>1200</Value>
+							</ValueList>
+						</Property>
+						<Property Name="Volume" Type="Real64">
+							<ValueList>
+								<Value>12</Value>
+							</ValueList>
+						</Property>
+					</PropertyList>
+					<ReferenceList>
+						<Reference Name="Conversion">
+							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{BD85A285-93BF-4FCB-92C0-AA1DEFCD1577}"/>
+						</Reference>
+						<Reference Name="OutputBus">
+							<ObjectRef Name="Main Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{1BE33615-E9DB-4B51-B373-C9F45EEA4B44}"/>
+						</Reference>
+					</ReferenceList>
+					<ChildrenList>
+						<AudioFileSource Name="Pistol Sound Effect" ID="{09AD1286-0947-4A2A-9959-091821814CB6}">
+							<Language>SFX</Language>
+							<AudioFile>Pistol Sound Effect.wav</AudioFile>
+							<MediaIDList>
+								<MediaID ID="989107178"/>
+							</MediaIDList>
+						</AudioFileSource>
+					</ChildrenList>
+					<ActiveSourceList>
+						<ActiveSource Name="Pistol Sound Effect" ID="{09AD1286-0947-4A2A-9959-091821814CB6}" Platform="Linked"/>
+					</ActiveSourceList>
+				</Sound>
+				<Sound Name="Disparo_E" ID="{B4464987-21EF-419B-97F0-0C51289E8663}" ShortID="126879171">
+					<PropertyList>
+						<Property Name="Pitch" Type="int32">
+							<ValueList>
+								<Value>2170</Value>
+							</ValueList>
+						</Property>
+						<Property Name="Volume" Type="Real64">
+							<ValueList>
+								<Value>-13</Value>
+							</ValueList>
+						</Property>
+					</PropertyList>
+					<ReferenceList>
+						<Reference Name="Conversion">
+							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{BD85A285-93BF-4FCB-92C0-AA1DEFCD1577}"/>
+						</Reference>
+						<Reference Name="OutputBus">
+							<ObjectRef Name="Main Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{1BE33615-E9DB-4B51-B373-C9F45EEA4B44}"/>
+						</Reference>
+					</ReferenceList>
+					<ChildrenList>
+						<AudioFileSource Name="Laser Gun - Sound Effect HD" ID="{F9B559E4-4A19-4EAD-911B-4B062387EC56}">
+							<Language>SFX</Language>
+							<AudioFile>Laser Gun - Sound Effect HD.wav</AudioFile>
+							<MediaIDList>
+								<MediaID ID="746447130"/>
+							</MediaIDList>
+						</AudioFileSource>
+					</ChildrenList>
+					<ActiveSourceList>
+						<ActiveSource Name="Laser Gun - Sound Effect HD" ID="{F9B559E4-4A19-4EAD-911B-4B062387EC56}" Platform="Linked"/>
+					</ActiveSourceList>
+				</Sound>
+				<Sound Name="Pausa" ID="{80CA8279-ECE7-488B-83D5-B3F744B8D796}" ShortID="470158720">
+					<ReferenceList>
+						<Reference Name="Conversion">
+							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{BD85A285-93BF-4FCB-92C0-AA1DEFCD1577}"/>
+						</Reference>
+						<Reference Name="OutputBus">
+							<ObjectRef Name="Main Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{1BE33615-E9DB-4B51-B373-C9F45EEA4B44}"/>
+						</Reference>
+					</ReferenceList>
+					<ChildrenList>
+						<AudioFileSource Name="Elevator Music" ID="{B7E59823-E429-4D11-AA0B-FF9DC42BD36B}">
+							<Language>SFX</Language>
+							<AudioFile>Elevator Music.wav</AudioFile>
+							<MediaIDList>
+								<MediaID ID="331730285"/>
+							</MediaIDList>
+						</AudioFileSource>
+					</ChildrenList>
+					<ActiveSourceList>
+						<ActiveSource Name="Elevator Music" ID="{B7E59823-E429-4D11-AA0B-FF9DC42BD36B}" Platform="Linked"/>
+					</ActiveSourceList>
+				</Sound>
+			</ChildrenList>
+		</WorkUnit>
+	</Containers>
+</WwiseDocument>

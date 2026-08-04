@@ -1,0 +1,47 @@
+{
+ "SoundBanksInfo": {
+  "Platform": "Windows",
+  "BasePlatform": "Windows",
+  "SchemaVersion": "16",
+  "SoundBankVersion": "172",
+  "SoundBanks": [
+   {
+    "Id": "3092587489",
+    "Type": "User",
+    "GUID": "{CC84F6EA-08D1-4F8A-A23E-FA0F3EB579FA}",
+    "Language": "SFX",
+    "Hash": "{79927BE5-3AEC-D0A6-BA9E-B53E9C5D2F3A}",
+    "ObjectPath": "\\SoundBanks\\Default Work Unit\\Pausa",
+    "ShortName": "Pausa",
+    "Path": "Pausa.bnk",
+    "Media": [
+     {
+      "Id": "331730285",
+      "Language": "SFX",
+      "Streaming": "false",
+      "Location": "Memory",
+      "ShortName": "Elevator Music.wav",
+      "CachePath": "3B/{3B696C0C-A8FE-0EBD-5E94-5ECD8B703032}.wem"
+     }
+    ],
+    "Events": [
+     {
+      "Id": "3092587489",
+      "Name": "Pausa",
+      "ObjectPath": "\\Events\\Default Work Unit\\Pausa",
+      "GUID": "{CB1D05EA-C0DE-4D06-A624-26DA109FEE10}",
+      "DurationType": "OneShot",
+      "DurationMin": "60.81306",
+      "DurationMax": "60.81306",
+      "MediaRefs": [
+       {
+        "Id": "331730285"
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "FileHash": "{E8D541FF-0F66-471D-7E44-2F27CB700282}"
+ }
+}

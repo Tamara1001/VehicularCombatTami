@@ -1,0 +1,6 @@
+Event	ID	Name			Wwise Object Path	Notes
+	2932040671	Play_Music			\Default Work Unit\Play_Music	
+
+In Memory Audio	ID	Name	Audio source file		Wwise Object Path	Notes	Data Size
+	858651576	HyperEpicSuperSpacialMusic	.cache\5E\{5E40A049-432D-330C-CE65-9CDC717FBCA4}.wem		\Containers\Default Work Unit\HyperEpicSuperSpacialMusic		14156668
+

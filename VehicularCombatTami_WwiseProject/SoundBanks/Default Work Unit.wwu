@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WwiseDocument Type="WorkUnit" ID="{A1CEEDD0-292F-4F40-97CA-7B7155139F52}" SchemaVersion="133">
+	<SoundBanks>
+		<WorkUnit Name="Default Work Unit" ID="{A1CEEDD0-292F-4F40-97CA-7B7155139F52}" PersistMode="Standalone">
+			<ChildrenList>
+				<SoundBank Name="VehicularCombat" ID="{EA466BF0-364C-404C-9649-22CA6BFA7B9F}">
+					<ObjectInclusionList>
+						<ObjectRef Name="Hidoina" ID="{916714A7-569F-4A63-82F3-C8BB38E38F6E}" WorkUnitID="{034AD1E5-EEBA-401B-A5B0-E0710B04FAF3}" Origin="Manual" Filter="7"/>
+					</ObjectInclusionList>
+					<ObjectExclusionList/>
+					<GameSyncExclusionList/>
+				</SoundBank>
+				<SoundBank Name="HyperEpicSuperSpacialMusic" ID="{ED816FE0-28F3-48E8-ACC9-791D25A5051C}">
+					<ObjectInclusionList>
+						<ObjectRef Name="HyperEpicSuperSpacialMusic" ID="{6109EAC9-B3ED-495C-8684-444C5F708FC1}" WorkUnitID="{034AD1E5-EEBA-401B-A5B0-E0710B04FAF3}" Origin="Manual" Filter="7"/>
+					</ObjectInclusionList>
+					<ObjectExclusionList/>
+					<GameSyncExclusionList/>
+				</SoundBank>
+				<SoundBank Name="Disparo_E" ID="{A1B622EC-75E3-496F-BDF6-34FDE5E6C568}">
+					<ObjectInclusionList>
+						<ObjectRef Name="Disparo_E" ID="{B4464987-21EF-419B-97F0-0C51289E8663}" WorkUnitID="{034AD1E5-EEBA-401B-A5B0-E0710B04FAF3}" Origin="Manual" Filter="7"/>
+					</ObjectInclusionList>
+					<ObjectExclusionList/>
+					<GameSyncExclusionList/>
+				</SoundBank>
+				<SoundBank Name="Disparo_J" ID="{95D66B3D-CAE9-4CC5-95D1-0632AB5C0600}">
+					<ObjectInclusionList>
+						<ObjectRef Name="Disparo_J" ID="{8751E6B5-DCF4-46FE-9ADE-67218FD1873B}" WorkUnitID="{034AD1E5-EEBA-401B-A5B0-E0710B04FAF3}" Origin="Manual" Filter="7"/>
+					</ObjectInclusionList>
+					<ObjectExclusionList/>
+					<GameSyncExclusionList/>
+				</SoundBank>
+				<SoundBank Name="Pausa" ID="{CC84F6EA-08D1-4F8A-A23E-FA0F3EB579FA}">
+					<ObjectInclusionList>
+						<ObjectRef Name="Pausa" ID="{80CA8279-ECE7-488B-83D5-B3F744B8D796}" WorkUnitID="{034AD1E5-EEBA-401B-A5B0-E0710B04FAF3}" Origin="Manual" Filter="7"/>
+					</ObjectInclusionList>
+					<ObjectExclusionList/>
+					<GameSyncExclusionList/>
+				</SoundBank>
+			</ChildrenList>
+		</WorkUnit>
+	</SoundBanks>
+</WwiseDocument>

@@ -1,0 +1,47 @@
+{
+ "SoundBanksInfo": {
+  "Platform": "Windows",
+  "BasePlatform": "Windows",
+  "SchemaVersion": "16",
+  "SoundBankVersion": "172",
+  "SoundBanks": [
+   {
+    "Id": "318604567",
+    "Type": "User",
+    "GUID": "{A1B622EC-75E3-496F-BDF6-34FDE5E6C568}",
+    "Language": "SFX",
+    "Hash": "{2D8E070A-277C-EDEC-5017-78A583B06BAB}",
+    "ObjectPath": "\\SoundBanks\\Default Work Unit\\Disparo_E",
+    "ShortName": "Disparo_E",
+    "Path": "Disparo_E.bnk",
+    "Media": [
+     {
+      "Id": "746447130",
+      "Language": "SFX",
+      "Streaming": "false",
+      "Location": "Memory",
+      "ShortName": "Laser Gun - Sound Effect HD.wav",
+      "CachePath": "28/{28B0EE50-596D-20BE-253B-C73AD8197CBB}.wem"
+     }
+    ],
+    "Events": [
+     {
+      "Id": "318604567",
+      "Name": "Disparo_E",
+      "ObjectPath": "\\Events\\Default Work Unit\\Disparo_E",
+      "GUID": "{D1EDF71E-A1FF-43E1-9EE5-5C27321918E5}",
+      "DurationType": "OneShot",
+      "DurationMin": "6.9659863",
+      "DurationMax": "6.9659863",
+      "MediaRefs": [
+       {
+        "Id": "746447130"
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "FileHash": "{DD5AC699-37A3-A8A7-AD10-77BABF64F06C}"
+ }
+}

@@ -1,0 +1,6 @@
+Event	ID	Name			Wwise Object Path	Notes
+	3071699590	Play_Hidoina			\Default Work Unit\Play_Hidoina	
+
+In Memory Audio	ID	Name	Audio source file		Wwise Object Path	Notes	Data Size
+	903915283	Hidoina	.cache\95\{95D06C27-63FC-A0B1-C18A-68AB4C237F47}.wem		\Containers\Default Work Unit\Hidoina		1151072
+

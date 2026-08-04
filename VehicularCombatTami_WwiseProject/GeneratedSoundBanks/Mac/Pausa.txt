@@ -1,0 +1,6 @@
+Event	ID	Name			Wwise Object Path	Notes
+	3092587489	Pausa			\Default Work Unit\Pausa	
+
+In Memory Audio	ID	Name	Audio source file		Wwise Object Path	Notes	Data Size
+	331730285	Pausa	.cache\3B\{3B696C0C-A8FE-0EBD-5E94-5ECD8B703032}.wem		\Containers\Default Work Unit\Pausa		10727520
+

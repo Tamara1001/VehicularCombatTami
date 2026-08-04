@@ -1,0 +1,47 @@
+{
+ "SoundBanksInfo": {
+  "Platform": "Mac",
+  "BasePlatform": "Mac",
+  "SchemaVersion": "16",
+  "SoundBankVersion": "172",
+  "SoundBanks": [
+   {
+    "Id": "318604568",
+    "Type": "User",
+    "GUID": "{95D66B3D-CAE9-4CC5-95D1-0632AB5C0600}",
+    "Language": "SFX",
+    "Hash": "{76992DA5-C0CC-3BDD-B247-E972B3A90AEC}",
+    "ObjectPath": "\\SoundBanks\\Default Work Unit\\Disparo_J",
+    "ShortName": "Disparo_J",
+    "Path": "Disparo_J.bnk",
+    "Media": [
+     {
+      "Id": "989107178",
+      "Language": "SFX",
+      "Streaming": "false",
+      "Location": "Memory",
+      "ShortName": "Pistol Sound Effect.wav",
+      "CachePath": "95/{95927962-6B45-3C68-D1BD-5B883ED05219}.wem"
+     }
+    ],
+    "Events": [
+     {
+      "Id": "318604568",
+      "Name": "Disparo_J",
+      "ObjectPath": "\\Events\\Default Work Unit\\Disparo_J",
+      "GUID": "{15B0832D-0E4C-4F74-9F40-62FDC852E259}",
+      "DurationType": "OneShot",
+      "DurationMin": "4.3653517",
+      "DurationMax": "4.3653517",
+      "MediaRefs": [
+       {
+        "Id": "989107178"
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "FileHash": "{02902281-3FC8-EE46-0C29-5A53CE708725}"
+ }
+}

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WwiseDocument Type="WorkUnit" ID="{C16C1DF5-C5D7-4277-85D1-6367D0908E27}" SchemaVersion="133">
+	<Events>
+		<WorkUnit Name="Default Work Unit" ID="{C16C1DF5-C5D7-4277-85D1-6367D0908E27}" PersistMode="Standalone">
+			<ChildrenList>
+				<Event Name="Play_Hidoina" ID="{8FAFE123-28E3-4E1C-A5A4-F4630041FA9E}">
+					<ChildrenList>
+						<Action Name="" ID="{6FA81958-C905-40B8-81E1-38DFB789C414}" ShortID="1037233250">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="Hidoina" ID="{916714A7-569F-4A63-82F3-C8BB38E38F6E}" WorkUnitID="{034AD1E5-EEBA-401B-A5B0-E0710B04FAF3}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_Music" ID="{D70CB470-032C-41DE-AB4A-158C404508CE}">
+					<ChildrenList>
+						<Action Name="" ID="{C3A5F651-6624-42C3-B853-1B5E66FED6C3}" ShortID="492189163">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="HyperEpicSuperSpacialMusic" ID="{6109EAC9-B3ED-495C-8684-444C5F708FC1}" WorkUnitID="{034AD1E5-EEBA-401B-A5B0-E0710B04FAF3}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Disparo_E" ID="{D1EDF71E-A1FF-43E1-9EE5-5C27321918E5}">
+					<ChildrenList>
+						<Action Name="" ID="{2B0F5D46-EC5F-42BC-AF98-50A29BE2E20B}" ShortID="610487121">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="Disparo_E" ID="{B4464987-21EF-419B-97F0-0C51289E8663}" WorkUnitID="{034AD1E5-EEBA-401B-A5B0-E0710B04FAF3}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Disparo_J" ID="{15B0832D-0E4C-4F74-9F40-62FDC852E259}">
+					<ChildrenList>
+						<Action Name="" ID="{F25C62BA-73B5-4384-8844-339EB72C5F48}" ShortID="481064439">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="Disparo_J" ID="{8751E6B5-DCF4-46FE-9ADE-67218FD1873B}" WorkUnitID="{034AD1E5-EEBA-401B-A5B0-E0710B04FAF3}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Pausa" ID="{CB1D05EA-C0DE-4D06-A624-26DA109FEE10}">
+					<ChildrenList>
+						<Action Name="" ID="{D589E980-57A1-45D8-B2A0-ACD85984F04F}" ShortID="592373460">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="Pausa" ID="{80CA8279-ECE7-488B-83D5-B3F744B8D796}" WorkUnitID="{034AD1E5-EEBA-401B-A5B0-E0710B04FAF3}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+			</ChildrenList>
+		</WorkUnit>
+	</Events>
+</WwiseDocument>

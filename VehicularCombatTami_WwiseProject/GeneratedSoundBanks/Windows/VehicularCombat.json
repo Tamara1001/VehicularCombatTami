@@ -1,0 +1,45 @@
+{
+ "SoundBanksInfo": {
+  "Platform": "Windows",
+  "BasePlatform": "Windows",
+  "SchemaVersion": "16",
+  "SoundBankVersion": "172",
+  "SoundBanks": [
+   {
+    "Id": "1240941068",
+    "Type": "User",
+    "GUID": "{EA466BF0-364C-404C-9649-22CA6BFA7B9F}",
+    "Language": "SFX",
+    "Hash": "{33976332-3041-2B0C-0DD1-F025D1799390}",
+    "ObjectPath": "\\SoundBanks\\Default Work Unit\\VehicularCombat",
+    "ShortName": "VehicularCombat",
+    "Path": "VehicularCombat.bnk",
+    "Media": [
+     {
+      "Id": "903915283",
+      "Language": "SFX",
+      "Streaming": "false",
+      "Location": "Memory",
+      "ShortName": "Hidoina.wav",
+      "CachePath": "95/{95D06C27-63FC-A0B1-C18A-68AB4C237F47}.wem"
+     }
+    ],
+    "Events": [
+     {
+      "Id": "3071699590",
+      "Name": "Play_Hidoina",
+      "ObjectPath": "\\Events\\Default Work Unit\\Play_Hidoina",
+      "GUID": "{8FAFE123-28E3-4E1C-A5A4-F4630041FA9E}",
+      "DurationType": "Infinite",
+      "MediaRefs": [
+       {
+        "Id": "903915283"
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "FileHash": "{4ED3F5D9-DC9F-491E-EF7A-9305AF20E5D9}"
+ }
+}

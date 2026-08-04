@@ -1,0 +1,6 @@
+Event	ID	Name			Wwise Object Path	Notes
+	318604568	Disparo_J			\Default Work Unit\Disparo_J	
+
+In Memory Audio	ID	Name	Audio source file		Wwise Object Path	Notes	Data Size
+	989107178	Disparo_J	.cache\95\{95927962-6B45-3C68-D1BD-5B883ED05219}.wem		\Containers\Default Work Unit\Disparo_J		770144
+

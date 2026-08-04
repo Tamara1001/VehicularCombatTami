@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 660610350102662952}
   - component: {fileID: 8223713782167937344}
+  - component: {fileID: 5664200652909104459}
   m_Layer: 0
   m_Name: AudioManager
   m_TagString: Untagged
@@ -50,3 +51,28 @@ MonoBehaviour:
   _bgmLibrary: []
   _mainMenuMusic: {fileID: 0}
   _musicTargetVolume: 1
+--- !u!114 &5664200652909104459
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1823387644450977758}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77df3038b823aed4fbff41bc63c236f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: AK.Wwise.Unity.MonoBehaviour::AkBank
+  triggerList: ae8d9d44
+  useOtherObject: 0
+  data:
+    idInternal: 0
+    valueGuidInternal: 
+    WwiseObjectReference: {fileID: 11400000, guid: acf4167db729ff646b05e3839c0b0758, type: 2}
+  decodeBank: 0
+  overrideLoadSetting: 0
+  loadAsynchronous: 0
+  saveDecodedBank: 0
+  unloadTriggerList: 958ca0ea
+  bankNameInternal: 
+  valueGuidInternal: 

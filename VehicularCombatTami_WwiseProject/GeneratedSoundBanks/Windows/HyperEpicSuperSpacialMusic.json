@@ -1,0 +1,47 @@
+{
+ "SoundBanksInfo": {
+  "Platform": "Windows",
+  "BasePlatform": "Windows",
+  "SchemaVersion": "16",
+  "SoundBankVersion": "172",
+  "SoundBanks": [
+   {
+    "Id": "1569824145",
+    "Type": "User",
+    "GUID": "{ED816FE0-28F3-48E8-ACC9-791D25A5051C}",
+    "Language": "SFX",
+    "Hash": "{39B0EC8C-73E9-A20D-EC34-F362CB51BA3B}",
+    "ObjectPath": "\\SoundBanks\\Default Work Unit\\HyperEpicSuperSpacialMusic",
+    "ShortName": "HyperEpicSuperSpacialMusic",
+    "Path": "HyperEpicSuperSpacialMusic.bnk",
+    "Media": [
+     {
+      "Id": "858651576",
+      "Language": "SFX",
+      "Streaming": "false",
+      "Location": "Memory",
+      "ShortName": "Theme_MainMenu (1).wav",
+      "CachePath": "5E/{5E40A049-432D-330C-CE65-9CDC717FBCA4}.wem"
+     }
+    ],
+    "Events": [
+     {
+      "Id": "2932040671",
+      "Name": "Play_Music",
+      "ObjectPath": "\\Events\\Default Work Unit\\Play_Music",
+      "GUID": "{D70CB470-032C-41DE-AB4A-158C404508CE}",
+      "DurationType": "OneShot",
+      "DurationMin": "73.73215",
+      "DurationMax": "73.73215",
+      "MediaRefs": [
+       {
+        "Id": "858651576"
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "FileHash": "{C9EF9F92-2979-95D0-CEA1-B1F151B0DA05}"
+ }
+}
